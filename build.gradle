@@ -6,6 +6,7 @@ repositories {
 
 dependencies {
     implementation 'net.portswigger.burp.extender:burp-extender-api:2.3'
+    implementation 'net.java.dev.jna:jna:5.10.0'
 }
 
 task fatJar(type: Jar) {
