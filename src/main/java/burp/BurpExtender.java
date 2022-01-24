@@ -27,7 +27,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         new Thread(() -> {
             var err = ServerLibrary.INSTANCE.StartServer(this.host + ":" + this.port);
             if (!err.equals("")) {
-                var isGraceful = err.equals("Server stopped"); // server was stopped gracefully by calling StopServer()
+                var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;
                 out.println(err);
                 if (!isGraceful) callbacks.unloadExtension(); // fatal error; disable the extension
