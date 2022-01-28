@@ -2,3 +2,6 @@
 /.gradle/
 /gradle/wrapper/gradle-wrapper.jar
 /build/
+*.h
+*.so
+*.dll
