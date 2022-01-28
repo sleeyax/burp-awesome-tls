@@ -1,3 +1,3 @@
-module github.com/sleeyax/burp-awesome-tls
+module server
 
 go 1.17

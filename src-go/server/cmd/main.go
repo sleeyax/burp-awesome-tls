@@ -3,11 +3,17 @@ package main
 import "C"
 
 import (
+	"flag"
 	"fmt"
-	server "github.com/sleeyax/burp-awesome-tls"
+	"log"
+	"server"
 )
 
-func main() {}
+func main() {
+	addr := flag.String("a", server.DefaultAddress, "Address")
+	flag.Parse()
+	log.Fatalln(server.StartServer(*addr))
+}
 
 //export StartServer
 func StartServer(address *C.char) *C.char {

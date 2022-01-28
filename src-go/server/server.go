@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+const DefaultAddress string = "127.0.0.1:8887"
+
 var s *http.Server
 
 func init() {
