@@ -45,7 +45,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
         if (!ignoredHosts.contains(httpService.getHost())) {
             // messageInfo.setHttpService(helpers.buildHttpService("127.0.0.1", httpService.getPort(), httpService.getProtocol()));
-            messageInfo.setHttpService(helpers.buildHttpService(this.host, this.port, "http"));
+            messageInfo.setHttpService(helpers.buildHttpService(this.host, this.port, "https"));
         }
     }
 
