@@ -7,8 +7,8 @@ package http
 import (
 	"io"
 	"net/http/httptrace"
-	"net/http/internal/ascii"
 	"net/textproto"
+	"server/internal/net/http/internal/ascii"
 	"sort"
 	"strings"
 	"sync"

@@ -7,8 +7,8 @@ package http
 import (
 	"log"
 	"net"
-	"net/http/internal/ascii"
 	"net/textproto"
+	"server/internal/net/http/internal/ascii"
 	"strconv"
 	"strings"
 	"time"

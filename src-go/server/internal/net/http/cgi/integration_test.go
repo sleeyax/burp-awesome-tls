@@ -12,7 +12,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"internal/testenv"
+	// "internal/testenv"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +26,7 @@ import (
 // This test is a CGI host (testing host.go) that runs its own binary
 // as a child process testing the other half of CGI (child.go).
 func TestHostingOurselves(t *testing.T) {
-	testenv.MustHaveExec(t)
+	// testenv.MustHaveExec(t)
 
 	h := &Handler{
 		Path: os.Args[0],
@@ -93,7 +93,7 @@ func (w *limitWriter) Write(p []byte) (n int, err error) {
 // If there's an error copying the child's output to the parent, test
 // that we kill the child.
 func TestKillChildAfterCopyError(t *testing.T) {
-	testenv.MustHaveExec(t)
+	// testenv.MustHaveExec(t)
 
 	h := &Handler{
 		Path: os.Args[0],
@@ -115,7 +115,7 @@ func TestKillChildAfterCopyError(t *testing.T) {
 // Test that a child handler writing only headers works.
 // golang.org/issue/7196
 func TestChildOnlyHeaders(t *testing.T) {
-	testenv.MustHaveExec(t)
+	// testenv.MustHaveExec(t)
 
 	h := &Handler{
 		Path: os.Args[0],
@@ -134,7 +134,7 @@ func TestChildOnlyHeaders(t *testing.T) {
 // Test that a child handler does not receive a nil Request Body.
 // golang.org/issue/39190
 func TestNilRequestBody(t *testing.T) {
-	testenv.MustHaveExec(t)
+	// testenv.MustHaveExec(t)
 
 	h := &Handler{
 		Path: os.Args[0],
@@ -149,7 +149,7 @@ func TestNilRequestBody(t *testing.T) {
 }
 
 func TestChildContentType(t *testing.T) {
-	testenv.MustHaveExec(t)
+	// testenv.MustHaveExec(t)
 
 	h := &Handler{
 		Path: os.Args[0],

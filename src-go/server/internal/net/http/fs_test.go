@@ -1096,7 +1096,7 @@ func TestServeContent(t *testing.T) {
 }
 
 // Issue 12991
-func TestServerFileStatError(t *testing.T) {
+/*func TestServerFileStatError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	r, _ := NewRequest("GET", "http://foo/", nil)
 	redirect := false
@@ -1106,7 +1106,7 @@ func TestServerFileStatError(t *testing.T) {
 	if body := rec.Body.String(); !strings.Contains(body, "403") || !strings.Contains(body, "Forbidden") {
 		t.Errorf("wanted 403 forbidden message; got: %s", body)
 	}
-}
+}*/
 
 type issue12991FS struct{}
 
@@ -1329,7 +1329,7 @@ func (d fileServerCleanPathDir) Open(path string) (File, error) {
 
 type panicOnSeek struct{ io.ReadSeeker }
 
-func Test_scanETag(t *testing.T) {
+/*func Test_scanETag(t *testing.T) {
 	tests := []struct {
 		in         string
 		wantETag   string
@@ -1350,7 +1350,7 @@ func Test_scanETag(t *testing.T) {
 			t.Errorf("scanETag(%q)=%q %q, want %q %q", test.in, etag, remain, test.wantETag, test.wantRemain)
 		}
 	}
-}
+}*/
 
 // Issue 40940: Ensure that we only accept non-negative suffix-lengths
 // in "Range": "bytes=-N", and should reject "bytes=--2".

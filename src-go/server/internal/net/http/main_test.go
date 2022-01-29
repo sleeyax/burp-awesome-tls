@@ -91,7 +91,7 @@ func goroutineLeaked() bool {
 // compatible with the afterTest func in non-short mode.
 func setParallel(t *testing.T) {
 	if strings.Contains(t.Name(), "HTTP2") {
-		http.CondSkipHTTP2(t)
+		// http.CondSkipHTTP2(t)
 	}
 	if testing.Short() {
 		t.Parallel()
