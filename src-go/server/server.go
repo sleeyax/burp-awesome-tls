@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"net/http"
+	"server/internal/net/http"
 )
 
 const DefaultAddress string = "127.0.0.1:8887"
@@ -47,6 +47,7 @@ func StartServer(addr string) error {
 	}
 
 	tlsListener := tls.NewListener(listener, s.TLSConfig)
+
 	return s.Serve(tlsListener)
 }
 

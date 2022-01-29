@@ -62,11 +62,11 @@ func NewCertificateAuthority() (*x509.Certificate, *rsa.PrivateKey, error) {
 	certFromDisk, err := readCertFromDisk(caFile)
 
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		log.Printf("Error reading cert from disk", caFile, err)
+		log.Printf("Error reading cert from disk %s %e", caFile, err)
 	} else if err == nil {
 		keyFromDisk, err := readPrivateKeyFromDisk(caKeyFile)
 		if err != nil {
-			log.Printf("Error reading private key from disk", caKeyFile, err)
+			log.Printf("Error reading private key from disk %s %e", caKeyFile, err)
 		} else {
 			return certFromDisk, keyFromDisk, nil
 		}
