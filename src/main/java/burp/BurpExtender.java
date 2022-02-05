@@ -1,7 +1,10 @@
 package burp;
 
+import com.google.gson.Gson;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener {
     private PrintWriter stdout;
@@ -9,6 +12,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     private IExtensionHelpers helpers;
     private String host;
     private int port;
+    private Gson gson;
+    private static final String HEADER_KEY = "GoRoundTripperConfig";
 
     @Override
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)
@@ -19,6 +24,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         // TODO: specify host & port in settings
         this.host = "127.0.0.1";
         this.port = 8887;
+        this.gson = new Gson();
 
         callbacks.setExtensionName("Awesome TLS");
         callbacks.registerHttpListener(this);
@@ -40,13 +46,18 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         if (!messageIsRequest) return;
 
         var httpService = messageInfo.getHttpService();
+        var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
-        var ignoredHosts = new ArrayList<String>(); // TODO: ignore specific hosts from going through this extension through a setting
+        var goConfig = new GoRoundTripperConfig(); // TODO: set config values from UI
+        goConfig.Url = httpService.getProtocol() + "://" + httpService.getHost() + ":" + httpService.getPort();
+        var goConfigJSON = this.gson.toJson(goConfig);
+        this.stdout.println("Config changed: " + goConfigJSON);
 
-        if (!ignoredHosts.contains(httpService.getHost())) {
-            // messageInfo.setHttpService(helpers.buildHttpService("127.0.0.1", httpService.getPort(), httpService.getProtocol()));
-            messageInfo.setHttpService(helpers.buildHttpService(this.host, this.port, "https"));
-        }
+        var headers = req.getHeaders();
+        headers.add(HEADER_KEY + ": " + goConfigJSON);
+
+        messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
+        messageInfo.setHttpService(helpers.buildHttpService(this.host, this.port, "https"));
     }
 
     @Override

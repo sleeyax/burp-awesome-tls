@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	addr := flag.String("a", server.DefaultAddress, "Address")
+	addr := flag.String("a", server.DefaultAddress, "Address to listen on ([ip:]port)")
 	flag.Parse()
 	log.Fatalln(server.StartServer(*addr))
 }
