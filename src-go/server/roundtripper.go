@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	utls "github.com/refraction-networking/utls"
 	"net"
 	"net/url"
 	"server/internal/net/http"
+	"server/internal/net/http2"
 	"strings"
 	"time"
 )
@@ -91,11 +93,20 @@ func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	tr := &http.Transport{
-		DialTLSContext: func(ctx context.Context, network string, addr string) (net.Conn, error) {
-			return tlsConn, nil
-		},
+	switch tlsConn.ConnectionState().NegotiatedProtocol {
+	case http2.NextProtoTLS:
+		h2 := http2.Transport{
+			DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+				return tlsConn, nil
+			},
+		}
+		return h2.RoundTrip(req)
+	default:
+		h1 := &http.Transport{
+			DialTLSContext: func(ctx context.Context, network string, addr string) (net.Conn, error) {
+				return tlsConn, nil
+			},
+		}
+		return h1.RoundTrip(req)
 	}
-
-	return tr.RoundTrip(req)
 }
