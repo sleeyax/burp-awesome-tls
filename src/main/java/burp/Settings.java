@@ -77,6 +77,8 @@ public class Settings {
                 "Default",
                 "Chrome 83",
                 "Chrome 96",
+                "Firefox 56",
+                "Firefox 65",
                 "iOS 13",
                 "iOS 14",
                 "Android 11 OkHttp"
