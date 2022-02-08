@@ -90,7 +90,7 @@ public class SettingsTab implements ITab {
         comboBoxFingerprint = new JComboBox();
         panelMain.add(comboBoxFingerprint, new GridConstraints(5, 0, 3, 5, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelCapture = new JLabel();
-        labelCapture.setText("Load fingerprint from capture (.pcap):");
+        labelCapture.setText("Load fingerprint from file:");
         panelMain.add(labelCapture, new GridConstraints(8, 0, 1, 3, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldCapturePath = new JTextField();
         panelMain.add(textFieldCapturePath, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));

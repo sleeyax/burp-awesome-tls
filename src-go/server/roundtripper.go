@@ -7,6 +7,7 @@ import (
 	utls "github.com/refraction-networking/utls"
 	"net"
 	"net/url"
+	"os"
 	"server/internal/net/http"
 	"server/internal/net/http2"
 	"strings"
@@ -29,8 +30,8 @@ type RoundTripper struct {
 	// Defaults to Chrome83.
 	TlsFingerprint Fingerprint
 
-	// Path to a packet capture file (.pcap) containing the TLS fingerprint to use.
-	// E.g. a client hello packet captured using WireShark.
+	// Path to a file  containing the TLS fingerprint to use in bytes.
+	// The bytes could be extracted from a client hello packet captured in WireShark, for example.
 	TlsFingerprintFilePath string
 }
 
@@ -84,9 +85,27 @@ func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 
 	tlsConn := utls.UClient(dialConn, config, utls.HelloCustom)
-	if err = tlsConn.ApplyPreset(r.TlsFingerprint.ToSpec()); err != nil {
+
+	var spec *utls.ClientHelloSpec
+	if r.TlsFingerprintFilePath != "" {
+		raw, err := os.ReadFile(r.TlsFingerprintFilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		fingerprinter := &utls.Fingerprinter{}
+		spec, err = fingerprinter.FingerprintClientHello(raw)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		spec = r.TlsFingerprint.ToSpec()
+	}
+
+	if err = tlsConn.ApplyPreset(spec); err != nil {
 		return nil, err
 	}
+
 	if err = tlsConn.Handshake(); err != nil {
 		return nil, err
 	}
