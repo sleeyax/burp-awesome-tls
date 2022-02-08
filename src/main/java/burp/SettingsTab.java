@@ -37,9 +37,8 @@ public class SettingsTab implements ITab {
 
         spinnerTimeout.setValue(settings.getTimeout());
 
-        comboBoxFingerprint.addItem("Default");
-        comboBoxFingerprint.addItem("Chrome 83");
-        comboBoxFingerprint.addItem("Chrome 96");
+        for (var item : settings.getTlsFingerprints())
+            comboBoxFingerprint.addItem(item);
         comboBoxFingerprint.setSelectedItem(settings.getTlsFingerprint());
 
         textFieldCapturePath.setText(settings.getTlsFingerprintFilePath());

@@ -71,4 +71,15 @@ public class Settings {
     public void setTlsFingerprintFilePath(String tlsFingerprintFilePath) {
         this.write(this.tlsFingerprintFilePath, tlsFingerprintFilePath);
     }
+
+    public String[] getTlsFingerprints() {
+        return new String[]{
+                "Default",
+                "Chrome 83",
+                "Chrome 96",
+                "iOS 13",
+                "iOS 14",
+                "Android 11 OkHttp"
+        };
+    }
 }
