@@ -8278,6 +8278,10 @@ func (cc *http2ClientConn) encodeHeaders(req *Request, addGzipHeader bool, trail
 	// continue to reuse the hpack encoder for future requests)
 	for k, vv := range req.Header {
 		if !httpguts.ValidHeaderFieldName(k) {
+			// Allow the HeaderOrderKey magic string, this will be handled further.
+			if k == HeaderOrderKey {
+				continue
+			}
 			return nil, fmt.Errorf("invalid HTTP header name %q", k)
 		}
 		for _, v := range vv {

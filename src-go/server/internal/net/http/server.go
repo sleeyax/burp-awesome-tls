@@ -988,6 +988,10 @@ func (c *conn) readRequest(ctx context.Context) (w *response, err error) {
 	}
 	for k, vv := range req.Header {
 		if !httpguts.ValidHeaderFieldName(k) {
+			// Allow the HeaderOrderKey magic string, this will be handled further.
+			if k == HeaderOrderKey {
+				continue
+			}
 			return nil, badRequestError("invalid header name")
 		}
 		for _, v := range vv {

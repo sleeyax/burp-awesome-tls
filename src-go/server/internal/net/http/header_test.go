@@ -89,6 +89,19 @@ var headerWriteTests = []struct {
 			"k4: 4a\r\nk4: 4b\r\nk6: 6a\r\nk6: 6b\r\n" +
 			"k7: 7a\r\nk7: 7b\r\nk8: 8a\r\nk8: 8b\r\nk9: 9a\r\nk9: 9b\r\n",
 	},
+	// Test sorting headers by the special Header-Order header
+	{
+		Header{
+			"a":            {"2"},
+			"b":            {"3"},
+			"e":            {"1"},
+			"c":            {"5"},
+			"d":            {"4"},
+			HeaderOrderKey: {"e", "a", "b", "d", "c"},
+		},
+		nil,
+		"e: 1\r\na: 2\r\nb: 3\r\nd: 4\r\nc: 5\r\n",
+	},
 }
 
 func TestHeaderWrite(t *testing.T) {

@@ -1645,6 +1645,10 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 	// continue to reuse the hpack encoder for future requests)
 	for k, vv := range req.Header {
 		if !httpguts.ValidHeaderFieldName(k) {
+			// Allow the HeaderOrderKey magic string, this will be handled further.
+			if k == http.HeaderOrderKey {
+				continue
+			}
 			return nil, fmt.Errorf("invalid HTTP header name %q", k)
 		}
 		for _, v := range vv {
@@ -1675,7 +1679,16 @@ func (cc *ClientConn) encodeHeaders(req *http.Request, addGzipHeader bool, trail
 		}
 
 		var didUA bool
-		for k, vv := range req.Header {
+
+		order := req.Header[http.HeaderOrderKey]
+
+		for _, k := range order {
+			vv := req.Header[k]
+
+			if vv == nil {
+				continue
+			}
+
 			if asciiEqualFold(k, "host") || asciiEqualFold(k, "content-length") {
 				// Host is :authority, already sent.
 				// Content-Length is automatic, set below.
@@ -2110,7 +2123,7 @@ func (rl *clientConnReadLoop) handleResponse(cs *clientStream, f *MetaHeadersFra
 
 	regularFields := f.RegularFields()
 	strs := make([]string, len(regularFields))
-	header := make(http.Header, len(regularFields))
+	header := make(http.Header, len(regularFields)+1)
 	res := &http.Response{
 		Proto:      "HTTP/2.0",
 		ProtoMajor: 2,
@@ -2130,6 +2143,18 @@ func (rl *clientConnReadLoop) handleResponse(cs *clientStream, f *MetaHeadersFra
 				t[http.CanonicalHeaderKey(v)] = nil
 			})
 		} else {
+			// Add the key to the header order if it wasn't added yet.
+			var keyFound bool
+			for _, h := range header[http.HeaderOrderKey] {
+				if h == key {
+					keyFound = true
+					break
+				}
+			}
+			if !keyFound {
+				header[http.HeaderOrderKey] = append(header[http.HeaderOrderKey], key)
+			}
+
 			vv := header[key]
 			if vv == nil && len(strs) > 0 {
 				// More than likely this will be a single-element key.

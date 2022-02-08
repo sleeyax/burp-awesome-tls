@@ -519,6 +519,10 @@ func (t *Transport) roundTrip(req *Request) (*Response, error) {
 	if isHTTP {
 		for k, vv := range req.Header {
 			if !httpguts.ValidHeaderFieldName(k) {
+				// Allow the HeaderOrderKey magic string, this will be handled further.
+				if k == HeaderOrderKey {
+					continue
+				}
 				req.closeBody()
 				return nil, fmt.Errorf("net/http: invalid header field name %q", k)
 			}

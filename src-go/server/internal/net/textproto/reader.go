@@ -541,6 +541,9 @@ func (r *Reader) ReadMIMEHeader() (MIMEHeader, error) {
 			m[key] = append(vv, value)
 		}
 
+		// NOTE(sleeyax): http.HeaderOrderKey can't be used because of dep. cycle!
+		m["Header-Order:"] = append(m["Header-Order:"], key)
+
 		if err != nil {
 			return m, err
 		}
