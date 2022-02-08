@@ -29,8 +29,9 @@ type RoundTripper struct {
 	// Defaults to Chrome83.
 	TlsFingerprint Fingerprint
 
-	// Optional Server Name Indication override.
-	SNI string
+	// Path to a packet capture file (.pcap) containing the TLS fingerprint to use.
+	// E.g. a client hello packet captured using WireShark.
+	TlsFingerprintFilePath string
 }
 
 func NewRoundTripper() *RoundTripper {
@@ -85,9 +86,6 @@ func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	tlsConn := utls.UClient(dialConn, config, utls.HelloCustom)
 	if err = tlsConn.ApplyPreset(r.TlsFingerprint.ToSpec()); err != nil {
 		return nil, err
-	}
-	if r.SNI != "" {
-		tlsConn.SetSNI(r.SNI)
 	}
 	if err = tlsConn.Handshake(); err != nil {
 		return nil, err
