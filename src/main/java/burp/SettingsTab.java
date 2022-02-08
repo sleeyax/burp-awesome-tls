@@ -19,6 +19,8 @@ public class SettingsTab implements ITab {
     private JTextField textFieldAddress;
     private JLabel labelAddress;
     private JButton buttonSave;
+    private JLabel labelTimeout;
+    private JSpinner spinnerTimeout;
 
     @Override
     public String getTabCaption() {
@@ -31,12 +33,14 @@ public class SettingsTab implements ITab {
     }
 
     public SettingsTab(Settings settings) {
+        textFieldAddress.setText(settings.getAddress());
+
+        spinnerTimeout.setValue(settings.getTimeout());
+
         comboBoxFingerprint.addItem("Default");
         comboBoxFingerprint.addItem("Chrome 83");
         comboBoxFingerprint.addItem("Chrome 96");
         comboBoxFingerprint.setSelectedItem(settings.getTlsFingerprint());
-
-        textFieldAddress.setText(settings.getAddress());
 
         textFieldCapturePath.setText(settings.getTlsFingerprintFilePath());
 
@@ -52,8 +56,9 @@ public class SettingsTab implements ITab {
         buttonSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                settings.setTlsFingerprint((String) comboBoxFingerprint.getSelectedItem());
                 settings.setAddress(textFieldAddress.getText());
+                settings.setTimeout((int) spinnerTimeout.getValue());
+                settings.setTlsFingerprint((String) comboBoxFingerprint.getSelectedItem());
                 settings.setTlsFingerprintFilePath(textFieldCapturePath.getText());
             }
         });
@@ -75,35 +80,40 @@ public class SettingsTab implements ITab {
      */
     private void $$$setupUI$$$() {
         panelMain = new JPanel();
-        panelMain.setLayout(new GridLayoutManager(10, 5, new Insets(0, 0, 0, 0), -1, -1));
+        panelMain.setLayout(new GridLayoutManager(12, 5, new Insets(0, 0, 0, 0), -1, -1));
         labelFingerprint = new JLabel();
         labelFingerprint.setEnabled(true);
         labelFingerprint.setHorizontalAlignment(10);
         labelFingerprint.setText("Fingerprint:");
         labelFingerprint.setVerticalAlignment(0);
         labelFingerprint.setVerticalTextPosition(0);
-        panelMain.add(labelFingerprint, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelFingerprint, new GridConstraints(4, 0, 1, 3, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         comboBoxFingerprint = new JComboBox();
-        panelMain.add(comboBoxFingerprint, new GridConstraints(3, 0, 3, 5, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(comboBoxFingerprint, new GridConstraints(5, 0, 3, 5, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelCapture = new JLabel();
         labelCapture.setText("Load fingerprint from capture (.pcap):");
-        panelMain.add(labelCapture, new GridConstraints(6, 0, 1, 3, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelCapture, new GridConstraints(8, 0, 1, 3, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldCapturePath = new JTextField();
-        panelMain.add(textFieldCapturePath, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        panelMain.add(textFieldCapturePath, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         buttonCaptureBrowse = new JButton();
         buttonCaptureBrowse.setText("Browse");
-        panelMain.add(buttonCaptureBrowse, new GridConstraints(7, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(buttonCaptureBrowse, new GridConstraints(9, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
-        panelMain.add(spacer1, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panelMain.add(spacer1, new GridConstraints(11, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         labelAddress = new JLabel();
         labelAddress.setRequestFocusEnabled(false);
-        labelAddress.setText("Listener address");
+        labelAddress.setText("Listener address:");
         panelMain.add(labelAddress, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldAddress = new JTextField();
         panelMain.add(textFieldAddress, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         buttonSave = new JButton();
-        buttonSave.setText("Save all settings");
-        panelMain.add(buttonSave, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        buttonSave.setText("Save settings");
+        panelMain.add(buttonSave, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        labelTimeout = new JLabel();
+        labelTimeout.setText("Connection timeout (seconds)");
+        panelMain.add(labelTimeout, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        spinnerTimeout = new JSpinner();
+        panelMain.add(spinnerTimeout, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

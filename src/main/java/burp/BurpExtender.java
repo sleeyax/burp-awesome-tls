@@ -47,15 +47,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         if (!messageIsRequest) return;
 
-        try {
-            var url = new URL("https://" + this.settings.getAddress());
-            messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
-        } catch (Exception e) {
-            this.stderr.println("Failed to intercept http service: " + e.toString());
-            this.callbacks.unloadExtension();
-            return;
-        }
-
         var httpService = messageInfo.getHttpService();
         var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
@@ -70,7 +61,14 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var headers = req.getHeaders();
         headers.add(HEADER_KEY + ": " + goConfigJSON);
 
-        messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
+        try {
+            var url = new URL("https://" + this.settings.getAddress());
+            messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
+            messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
+        } catch (Exception e) {
+            this.stderr.println("Failed to intercept http service: " + e.toString());
+            this.callbacks.unloadExtension();
+        }
     }
 
     @Override

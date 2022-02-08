@@ -21,9 +21,9 @@ type RoundTripper struct {
 	// Example: https://sleeyax.com:443
 	Url string
 
-	// Connection dial timeout.
+	// Connection dial timeout in seconds.
 	// Defaults to 10 seconds.
-	Timeout time.Duration
+	Timeout int64
 
 	// Profile to use during TLS client hello handshake.
 	// Defaults to Chrome83.
@@ -56,8 +56,8 @@ func NewRoundTripperFromJson(data string) (*RoundTripper, error) {
 func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// TODO(maybe): caching
 
-	if int64(r.Timeout) == 0 {
-		r.Timeout = time.Second * 10
+	if r.Timeout == 0 {
+		r.Timeout = 10
 	}
 
 	// Update request URL to point to the destined server.
@@ -74,7 +74,7 @@ func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 		return tr.RoundTrip(req)
 	}
 
-	dialConn, err := net.DialTimeout("tcp", toTCPAddress(req.URL), r.Timeout)
+	dialConn, err := net.DialTimeout("tcp", toTCPAddress(req.URL), time.Duration(int64(time.Second)*r.Timeout))
 	if err != nil {
 		return nil, err
 	}
