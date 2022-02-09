@@ -39,3 +39,6 @@ See [workflows](.github/workflows) for the target programming language versions.
 
 You should now have on jar file, containing all dependencies. 
 If you'd rather separate the server binary from the jar, start over from step 1 but instead build the binary to the output directory of the jar.
+
+## License
+[GPL V3](./LICENSE)
