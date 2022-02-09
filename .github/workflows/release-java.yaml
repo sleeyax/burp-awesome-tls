@@ -1,0 +1,29 @@
+name: Release java jars
+
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    name: Create java jars
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Execute Gradle build
+        run: ./gradlew fatJar
+      - name: Upload to GitHub releases
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "./build/libs/*.jar"
+          tags: true
+          draft: false
+          update_latest_release: true

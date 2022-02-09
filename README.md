@@ -16,6 +16,14 @@ This magic header is stripped from the request before it's forwarded to the dest
 
 Another option would've been to code an upstream proxy server and connect burp to it, but I personally wanted an extension because it's customizable at runtime and more portable. 
 
+## Installation
+You'll need to download at least 2 files from the [releases](https://github.com/sleeyax/burp-awesome-tls/releases) page:
+The extension itself (.jar) and the local server binary (extension depends on your platform and arch).
+Make sure to rename the local server binary to `server.{EXT}`, where `{EXT}` is your platform's extension, e.g `server.dll` and place it somewhere in `PATH` OR at the same location where you downloaded the extension .jar file to.
+
+Semantic versioning is applied here and significant changes to the extension GUI are considered major. 
+This way you only need to swap out the server binaries when new minor versions are released.
+
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
 The build instructions below assume you're using the same tools to build.

@@ -1,4 +1,4 @@
-name: Build and release binaries
+name: Release go binaries
 
 on:
   release:
@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: "./src-go/server/build/*"
-          delete_file: "build/*.h"
+          delete_file: "./src-go/server/build/*.h"
           tags: true
           draft: false
           update_latest_release: true
