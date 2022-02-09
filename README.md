@@ -1,6 +1,8 @@
 # Awesome TLS
 This extension hijacks Burp's HTTP and TLS stack to make it more powerful and less prone to fingerprinting by all kinds of WAFs.
-It does this without resorting to hacks, reflection or forked Burp Suite Community code. All Java code only utilises Burp's Extender API.
+It does this without resorting to hacks, reflection or forked Burp Suite Community code. All Java code only leverages Burp's Extender API.
+
+![screenshot](./docs/screenshot.png)
 
 ## How it works
 Unfortunately Burp's Extender API is very limited for more advanced use cases like this, so I had to play around with it to make this work. 
@@ -21,7 +23,7 @@ You'll need to download at least 2 files from the [releases](https://github.com/
 The extension itself (.jar) and the local server binary (extension depends on your platform and arch).
 Make sure to rename the local server binary to `server.{EXT}`, where `{EXT}` is your platform's extension, e.g `server.dll` and place it somewhere in `PATH` OR at the same location where you downloaded the extension .jar file to.
 
-Semantic versioning is applied here and significant changes to the extension GUI are considered major. 
+We use semantic versioning and significant changes to the extension GUI are considered major. 
 This way you only need to swap out the server binaries when new minor versions are released.
 
 ## Manual build Instructions
