@@ -41,6 +41,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: "./src-go/server/build/*;./build/libs/*.jar"
-          delete_file: "build/*.h"
           tags: true
           draft: false # set to true to store as draft (i.e. not public)

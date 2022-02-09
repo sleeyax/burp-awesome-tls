@@ -26,6 +26,8 @@ Make sure to rename the local server binary to `server.{EXT}`, where `{EXT}` is 
 We use semantic versioning and significant changes to the extension GUI are considered major. 
 This way you only need to swap out the server binaries when new minor versions are released.
 
+**NOTE**: if you want to help out with improving the build process/releases, see [this issue](https://github.com/sleeyax/burp-awesome-tls/issues/13).
+
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
 The build instructions below assume you're using the same tools to build.
