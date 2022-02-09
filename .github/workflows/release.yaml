@@ -1,11 +1,12 @@
-name: Release go binaries
+name: Release binaries
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'
 jobs:
   build:
-    name: Create native shared C libraries
+    name: Build and release binaries
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,13 +25,22 @@ jobs:
           ldflags: -w -s
           buildmode: c-shared
           working_dir: ./src-go/server
-      - name: Upload to GitHub releases
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Build standalone jar file
+        run: ./gradlew fatJar
+      # TODO: also build cross platform fatjar, containing all C binaries as 'resources'
+      - name: Upload go binaries
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "./src-go/server/build/*"
+          file: "./src-go/server/build/*;./build/libs/*.jar"
           delete_file: "./src-go/server/build/*.h"
           tags: true
-          draft: false
-          update_latest_release: true
+          draft: true
