@@ -22,7 +22,7 @@ jobs:
           targets: windows/amd64,linux/386,linux/amd64,darwin/386,darwin/amd64
           # Prints the build commands as compilation progresses (default false)
           x: true
-          ldflags: -w -s
+          ldflags: -w
           buildmode: c-shared
           working_dir: ./src-go/server
       - name: Set up JDK
