@@ -1,0 +1,36 @@
+name: Build and release binaries
+
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    name: Create native shared C libraries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Execute CGO builds using XGO
+        uses: crazy-max/ghaction-xgo@v1
+        # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
+        with:
+          xgo_version: latest
+          go_version: 1.17
+          dest: build
+          pkg: cmd
+          prefix: server
+          targets: windows/amd64,linux/386,linux/amd64,darwin/386,darwin/amd64
+          # Prints the build commands as compilation progresses (default false)
+          x: true
+          ldflags: -w -s
+          buildmode: c-shared
+          working_dir: ./src-go/server
+      - name: Upload to GitHub releases
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "./src-go/server/build/*"
+          delete_file: "build/*.h"
+          tags: true
+          draft: false
+          update_latest_release: true
