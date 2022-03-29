@@ -11,7 +11,8 @@ dependencies {
     implementation 'com.intellij:forms_rt:7.0.3'
 }
 
-task fatJar(type: Jar) {
+task buildJar(type: Jar) {
+    // duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

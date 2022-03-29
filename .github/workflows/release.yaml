@@ -19,7 +19,7 @@ jobs:
           dest: build
           pkg: cmd
           prefix: server
-          targets: windows/amd64,linux/386,linux/amd64,darwin/386,darwin/amd64
+          targets: windows/386,windows/amd64,linux/386,linux/amd64,darwin/amd64
           # Prints the build commands as compilation progresses (default false)
           x: true
           ldflags: -w
@@ -32,14 +32,14 @@ jobs:
           distribution: 'adopt'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Build standalone jar file
-        run: ./gradlew fatJar
-      # TODO: also build cross platform fatjar, containing all C binaries as 'resources'
-      - name: Upload go binaries
+      - name: Build cross-platform jar files
+        shell: sh
+        run: ./build.sh
+      - name: Upload binaries
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "./src-go/server/build/*;./build/libs/*.jar"
+          file: "./build/libs/*.jar"
           tags: true
           draft: false # set to true to store as draft (i.e. not public)
