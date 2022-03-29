@@ -19,14 +19,9 @@ This magic header is stripped from the request before it's forwarded to the dest
 Another option would've been to code an upstream proxy server and connect burp to it, but I personally wanted an extension because it's customizable at runtime and more portable. 
 
 ## Installation
-You'll need to download at least 2 files from the [releases](https://github.com/sleeyax/burp-awesome-tls/releases) page:
-The extension itself (.jar) and the local server binary (extension depends on your platform and arch).
-Make sure to rename the local server binary to `server.{EXT}`, where `{EXT}` is your platform's extension, e.g `server.dll` and place it somewhere in `PATH` OR at the same location where you downloaded the extension .jar file to.
-
-We use semantic versioning and significant changes to the extension GUI are considered major. 
-This way you only need to swap out the server binaries when new minor versions are released.
-
-**NOTE**: if you want to help out with improving the build process/releases, see [this issue](https://github.com/sleeyax/burp-awesome-tls/issues/13).
+1. Download the jar file for your operating system from [releases](https://github.com/sleeyax/burp-awesome-tls/releases). You can also download a fat jar, which works on all platforms supported by Awesome TLS. This means it's also portable and could be loaded from a USB for access from multiple different operating systems.
+2. Open burp (pro or community), go to Extender > Extensions and click on 'Add'. Then, select `Java` as the extension type and browse to the jar file you just downloaded. Click 'Next' at the bottom, and it should load the extension without any errors.
+3. Check your new 'Awesome TLS' tab in Burp for configuration settings and start hacking!
 
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
@@ -35,10 +30,9 @@ See [workflows](.github/workflows) for the target programming language versions.
 
 1. Compile the go package within `./src-go/`. Run `cd ./src-go/server && go build -o ../../src/main/resources/{OS}-{ARCH}/server.{EXT} -buildmode=c-shared ./cmd/main.go`, replacing `{OS}-{ARCH}` with your OS and CPU architecture and `{EXT}` with your platform's preferred extension for dynamic C libraries. For example: `linux-x86-64/server.so`. See the [JNA docs](https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md) for more info about supported platforms.
 2. Compile the GUI form `SettingsTab.form` into Java code via `Build > Build project`.
-3. Build the fat jar with Gradle.
+3. Build the jar with Gradle.
 
-You should now have on jar file, containing all dependencies. 
-If you'd rather separate the server binary from the jar, start over from step 1 but instead build the binary to the output directory of the jar.
+You should now have one jar file that works with Burp on your operating system.
 
 ## License
 [GPL V3](./LICENSE)
