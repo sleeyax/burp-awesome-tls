@@ -79,4 +79,4 @@ copy_linux_386
 copy_linux_amd64
 copy_windows_amd64
 copy_windows_386
-buildJar "Fat"
+buildJar "fat"
