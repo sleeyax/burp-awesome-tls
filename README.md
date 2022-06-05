@@ -24,15 +24,19 @@ Another option would've been to code an upstream proxy server and connect burp t
 3. Check your new 'Awesome TLS' tab in Burp for configuration settings and start hacking!
 
 ## Manual build Instructions
+
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
 The build instructions below assume you're using the same tools to build.
 See [workflows](.github/workflows) for the target programming language versions.
 
-1. Compile the go package within `./src-go/`. Run `cd ./src-go/server && go build -o ../../src/main/resources/{OS}-{ARCH}/server.{EXT} -buildmode=c-shared ./cmd/main.go`, replacing `{OS}-{ARCH}` with your OS and CPU architecture and `{EXT}` with your platform's preferred extension for dynamic C libraries. For example: `linux-x86-64/server.so`. See the [JNA docs](https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md) for more info about supported platforms.
-2. Compile the GUI form `SettingsTab.form` into Java code via `Build > Build project`.
-3. Build the jar with Gradle.
+1. Compile the go package within `./src-go/`. Run `cd ./src-go/server && go build -o ../../src/main/resources/${BUILD_OS}-${BUILD_OPT_ARCH}/server.${BUILD_EXT} -buildmode=c-shared -trimpath -ldflags='-s -w' ./cmd/main.go`, replacing `{OS}-{ARCH}` with your OS and CPU architecture and `${BUILD_EXT}` with your platform's preferred extension for dynamic C libraries. For example: `linux-x86-64/server.so`.
+Apple Silicon users should use `darwin/arm64` for Golang, `darwin/aarch64` for JNA, `.dylib` as extension for native library.
 
-You should now have one jar file that works with Burp on your operating system.
+2. See the [JNA docs](https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md) for more info about supported platforms. For prebuilt-supported platform list, check [here](https://github.com/java-native-access/jna/tree/master/lib/native).
+3. Compile the GUI form `SettingsTab.form` into Java code via `Build > Build project`.
+4. Build the jar with Gradle, for example: after downloading all dependencies via IDE, then run `gradle buildJar` or click on the right side panel icon for corresponding task.
+
+You should now have one jar file that works with Burp on your operating system at location `./build/libs`.
 
 ## License
 [GPL V3](./LICENSE)
