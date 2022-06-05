@@ -8,7 +8,7 @@ public class Settings {
     private final String tlsFingerprintFilePath = "TlsFingerprintFilePath";
 
     public static final String DEFAULT_ADDRESS = "127.0.0.1:8887";
-    public static final int DEFAULT_TIMEOUT = 10;
+    public static final String DEFAULT_TIMEOUT = "10";
     public static final String DEFAULT_TLS_FINGERPRINT = "Default";
 
     public Settings(IBurpExtenderCallbacks callbacks) {
@@ -17,14 +17,20 @@ public class Settings {
     }
 
     private void setDefaults() {
-        if (this.read(this.address) == null)
+        if (this.read(this.address) == null){
             this.write(this.address, DEFAULT_ADDRESS);
+        }
 
-        if (this.read(this.timeout) == null)
-            this.write(this.timeout, String.valueOf(DEFAULT_TIMEOUT));
 
-        if (this.read(this.tlsFingerprint) == null)
+        if (this.read(this.timeout) == null){
+            this.write(this.timeout, DEFAULT_TIMEOUT);
+        }
+
+
+        if (this.read(this.tlsFingerprint) == null) {
             this.write(this.tlsFingerprint, DEFAULT_TLS_FINGERPRINT);
+        }
+
     }
 
     public String read(String key, String defaultValue) {
