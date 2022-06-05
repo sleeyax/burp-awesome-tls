@@ -15,11 +15,11 @@ jobs:
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
         with:
           xgo_version: latest
-          go_version: 1.17
+          go_version: 1.18
           dest: build
           pkg: cmd
           prefix: server
-          targets: windows/386,windows/amd64,linux/386,linux/amd64,darwin/amd64
+          targets: windows/386,windows/amd64,linux/386,linux/amd64,darwin/amd64,darwin/arm64
           # Prints the build commands as compilation progresses (default false)
           x: true
           ldflags: -w
@@ -28,7 +28,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'adopt'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
