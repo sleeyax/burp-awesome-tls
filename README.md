@@ -1,6 +1,6 @@
 # Awesome TLS
-This extension hijacks Burp's HTTP and TLS stack to make it more powerful and less prone to fingerprinting by all kinds of WAFs.
-It does this without resorting to hacks, reflection or forked Burp Suite Community code. All Java code only leverages Burp's Extender API.
+This extension hijacks Burp's HTTP/TLS stack and allows you to spoof any browser fingerprint in order to make Burp more powerful and less prone to fingerprinting by all kinds of WAFs. 
+It does this without resorting to hacks, reflection or forked Burp Suite Community code. All Java code in this repository only leverages Burp's Extender API.
 
 ![screenshot](./docs/screenshot.png)
 
