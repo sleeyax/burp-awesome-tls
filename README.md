@@ -1,5 +1,5 @@
 # Awesome TLS
-This extension hijacks Burp's HTTP/TLS stack and allows you to spoof any [browser fingerprint](https://ja3er.com/) in order to make Burp more powerful and less prone to fingerprinting by all kinds of WAFs. 
+This extension hijacks Burp's HTTP/TLS stack and allows you to spoof any [browser fingerprint](https://ja3er.com/) in order to make it more powerful and less prone to fingerprinting by all kinds of WAFs. 
 It does this without resorting to hacks, reflection or forked Burp Suite Community code. All Java code in this repository only leverages Burp's Extender API.
 
 ![screenshot](./docs/screenshot.png)
@@ -22,6 +22,25 @@ Another option would've been to code an upstream proxy server and connect burp t
 1. Download the jar file for your operating system from [releases](https://github.com/sleeyax/burp-awesome-tls/releases). You can also download a fat jar, which works on all platforms supported by Awesome TLS. This means it's also portable and could be loaded from a USB for access from multiple different operating systems.
 2. Open burp (pro or community), go to Extender > Extensions and click on 'Add'. Then, select `Java` as the extension type and browse to the jar file you just downloaded. Click 'Next' at the bottom, and it should load the extension without any errors.
 3. Check your new 'Awesome TLS' tab in Burp for configuration settings and start hacking!
+
+## Configuration
+This extension should be 'plug and play' for most users, but here's an overview of all the available configuration settings that are available at the extension's dedicated tab in Burp.
+
+**listener address**
+
+Interface (`host:port`) the local HTTPS server should listen on. Reload the extension for the changes to take effect.
+
+**connnection timeout**
+
+TCP dial connection timeout.
+
+**fingerprint**
+
+TLS client or browser to spoof. Depending on your choice a different client hello packet will be sent during the handshake.
+
+**fingerprint from file**
+
+Captured TLS [client hello](https://www.rfc-editor.org/rfc/rfc8446#section-4.1.2) packet in raw bytes that should be sent during the handshake.
 
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
