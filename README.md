@@ -49,9 +49,9 @@ See [workflows](.github/workflows) for the target programming language versions.
 
 1. Compile the go package within `./src-go/`. Run `cd ./src-go/server && go build -o ../../src/main/resources/{OS}-{ARCH}/server.{EXT} -buildmode=c-shared ./cmd/main.go`, replacing `{OS}-{ARCH}` with your OS and CPU architecture and `{EXT}` with your platform's preferred extension for dynamic C libraries. For example: `linux-x86-64/server.so`. See the [JNA docs](https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md) for more info about supported platforms.
 2. Compile the GUI form `SettingsTab.form` into Java code via `Build > Build project`.
-3. Build the jar with Gradle.
+3. Build the jar with Gradle: `gradle buildJar`.
 
-You should now have one jar file that works with Burp on your operating system.
+You should now have one jar file (usually located at `./build/libs`) that works with Burp on your operating system.
 
 ## License
 [GPL V3](./LICENSE)
