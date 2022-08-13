@@ -32,7 +32,7 @@ copy() {
 }
 
 copy_macos() {
-  copy "server-darwin-10.16-amd64.dylib" "darwin-x86-64"
+  copy "server-darwin-amd64.dylib" "darwin-x86-64"
 }
 
 copy_linux_386() {
@@ -44,11 +44,11 @@ copy_linux_amd64() {
 }
 
 copy_windows_amd64() {
-  copy "server-windows-4.0-amd64.dll" "win32-x86-64"
+  copy "server-windows-amd64.dll" "win32-x86-64"
 }
 
 copy_windows_386() {
-  copy "server-windows-4.0-386.dll" "win32-x86"
+  copy "server-windows-386.dll" "win32-x86"
 }
 
 # build separate jar files per platform
