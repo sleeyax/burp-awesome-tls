@@ -51,7 +51,7 @@ func StartServer(addr string) error {
 		// Write the response (back to burp).
 		for k, _ := range res.Header {
 			v := res.Header.Get(k)
-			w.Header().Set(k, v)
+			w.Header().Add(k, v)
 		}
 		w.WriteHeader(res.StatusCode)
 		body, _ := io.ReadAll(res.Body)
