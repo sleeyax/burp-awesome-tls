@@ -19,11 +19,12 @@ copy() {
   # params
   local binary=$1
   local resourceFolder=$2
+  local prefix=$3
   local extension="${binary##*.}"
 
   # locations to copy to and from
   local binaryPath="./src-go/server/build/$binary"
-  local resourcePath="./src/main/resources/$resourceFolder/server.$extension"
+  local resourcePath="./src/main/resources/$resourceFolder/${prefix}server.$extension"
 
   # perform copy
   mkdir -p $(dirname "$resourcePath")
@@ -32,7 +33,7 @@ copy() {
 }
 
 copy_macos() {
-  copy "server-darwin-amd64.dylib" "darwin-x86-64"
+  copy "server-darwin-amd64.dylib" "darwin-x86-64" "lib"
 }
 
 copy_linux_386() {
