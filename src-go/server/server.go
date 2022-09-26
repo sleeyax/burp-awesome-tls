@@ -30,20 +30,20 @@ func StartServer(addr string) error {
 	}
 
 	m := http.NewServeMux()
-	m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		configHeader := r.Header.Get(ConfigurationHeaderKey)
+	m.HandleFunc("/", func(respWriter http.ResponseWriter, req *http.Request) {
+		configHeader := req.Header.Get(ConfigurationHeaderKey)
 
 		rt, err := NewRoundTripperFromJson(configHeader)
 		if err != nil {
-			writeError(w, err)
+			writeError(respWriter, err)
 			return
 		}
 
-		r.Header.Del(ConfigurationHeaderKey)
+		req.Header.Del(ConfigurationHeaderKey)
 
-		res, err := rt.RoundTrip(r)
+		res, err := rt.RoundTrip(req)
 		if err != nil {
-			writeError(w, err)
+			writeError(respWriter, err)
 			return
 		}
 		defer res.Body.Close()
@@ -52,12 +52,12 @@ func StartServer(addr string) error {
 		for key, _ := range res.Header {
 			values := res.Header.Values(key)
 			for _, val := range values {
-				w.Header().Add(key, val)
+				respWriter.Header().Add(key, val)
 			}
 		}
-		w.WriteHeader(res.StatusCode)
+		respWriter.WriteHeader(res.StatusCode)
 		body, _ := io.ReadAll(res.Body)
-		w.Write(body)
+		respWriter.Write(body)
 	})
 
 	s.Addr = addr
