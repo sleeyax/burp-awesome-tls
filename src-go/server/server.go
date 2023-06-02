@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"server/internal/net/http"
+	"net/http"
+	"server/internal"
 )
 
 // DefaultAddress is the default listener address.
@@ -15,7 +16,7 @@ const DefaultAddress string = "127.0.0.1:8887"
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
 // Note that this key can only start with one capital letter and the rest in lowercase.
 // Unfortunately, this seems to be a limitation of Burp's Extender API.
-const ConfigurationHeaderKey = "Goroundtripperconfig"
+const ConfigurationHeaderKey = "Awesometlsconfig"
 
 var s *http.Server
 
@@ -30,30 +31,37 @@ func StartServer(addr string) error {
 	}
 
 	m := http.NewServeMux()
-	m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		configHeader := r.Header.Get(ConfigurationHeaderKey)
+	m.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		configHeader := req.Header.Get(ConfigurationHeaderKey)
 
-		rt, err := NewRoundTripperFromJson(configHeader)
+		config, err := internal.ParseTransportConfig(configHeader)
 		if err != nil {
 			writeError(w, err)
 			return
 		}
 
-		r.Header.Del(ConfigurationHeaderKey)
+		transport := internal.NewTransport(config)
 
-		res, err := rt.RoundTrip(r)
+		req.Header.Del(ConfigurationHeaderKey)
+		req.URL.Host = config.Host
+		req.URL.Scheme = config.Scheme
+
+		res, err := transport.RoundTrip(req)
 		if err != nil {
 			writeError(w, err)
 			return
 		}
+
 		defer res.Body.Close()
 
 		// Write the response (back to burp).
-		for k, _ := range res.Header {
+		for k := range res.Header {
 			v := res.Header.Get(k)
 			w.Header().Add(k, v)
 		}
+
 		w.WriteHeader(res.StatusCode)
+
 		body, _ := io.ReadAll(res.Body)
 		w.Write(body)
 	})
@@ -62,7 +70,7 @@ func StartServer(addr string) error {
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{
-			tls.Certificate{
+			{
 				Certificate: [][]byte{ca.Raw},
 				PrivateKey:  private,
 				Leaf:        ca,
