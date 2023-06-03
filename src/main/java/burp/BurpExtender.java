@@ -15,7 +15,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
     private IExtensionHelpers helpers;
     private IBurpExtenderCallbacks callbacks;
 
-    private static final String HEADER_KEY = "Goroundtripperconfig"; // TODO: randomize this key and store it in a config.json file so the go server can retrieve it on startup
+    private static final String HEADER_KEY = "Awesometlsconfig";
 
     @Override
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)
@@ -50,12 +50,15 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var httpService = messageInfo.getHttpService();
         var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
-        var goConfig = new GoRoundTripperConfig();
-        goConfig.Url = httpService.getProtocol() + "://" + httpService.getHost() + ":" + httpService.getPort();
-        goConfig.Timeout = this.settings.getTimeout();
-        goConfig.TlsFingerprint = this.settings.getTlsFingerprint();
-        goConfig.TlsFingerprintFilePath = this.settings.getTlsFingerprintFilePath();
-        var goConfigJSON = this.gson.toJson(goConfig);
+        var transportConfig = new TransportConfig();
+        transportConfig.Host = httpService.getHost();
+        transportConfig.Scheme = httpService.getProtocol();
+        transportConfig.Fingerprint = this.settings.getFingerprint();
+        transportConfig.HttpTimeout = this.settings.getHttpTimeout();
+        transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
+        transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
+        transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
+        var goConfigJSON = this.gson.toJson(transportConfig);
         this.stdout.println("Using config: " + goConfigJSON);
 
         var headers = req.getHeaders();
@@ -66,7 +69,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
             messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
             messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
         } catch (Exception e) {
-            this.stderr.println("Failed to intercept http service: " + e.toString());
+            this.stderr.println("Failed to intercept http service: " + e);
             this.callbacks.unloadExtension();
         }
     }
