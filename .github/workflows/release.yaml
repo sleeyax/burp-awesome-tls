@@ -44,4 +44,4 @@ jobs:
         with:
           file: "./build/libs/*.jar"
           tags: true
-          draft: false # set to true to store as draft (i.e. not public)
+          draft: true
