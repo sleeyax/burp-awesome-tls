@@ -16,3 +16,5 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 )
+
+replace github.com/ooni/oohttp => github.com/sleeyax/oohttp v0.0.0-20230603093000-5878d39f799b
