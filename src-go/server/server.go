@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"server/internal"
+	"strings"
 )
 
 // DefaultAddress is the default listener address.
@@ -47,6 +48,12 @@ func StartServer(addr string) error {
 
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
+		if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
+			pHeaderOrder := []string{":method", ":authority", ":scheme", ":path"}
+			for _, pHeader := range pHeaderOrder {
+				req.Header.Add(http.PHeaderOrderKey, pHeader)
+			}
+		}
 
 		res, err := transport.RoundTrip(req)
 		if err != nil {
