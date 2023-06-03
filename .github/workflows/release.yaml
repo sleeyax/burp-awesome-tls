@@ -15,7 +15,7 @@ jobs:
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
         with:
           xgo_version: latest
-          go_version: 1.17
+          go_version: 1.20
           dest: build
           pkg: cmd
           prefix: server
