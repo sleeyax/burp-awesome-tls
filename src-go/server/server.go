@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	http "github.com/ooni/oohttp"
 	"io"
 	"net"
-	"net/http"
 	"server/internal"
 )
 
@@ -32,7 +32,10 @@ func StartServer(addr string) error {
 
 	m := http.NewServeMux()
 	m.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		http.EnableHeaderOrder(w)
+
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
+		req.Header.Del(ConfigurationHeaderKey)
 
 		config, err := internal.ParseTransportConfig(configHeader)
 		if err != nil {
@@ -42,7 +45,6 @@ func StartServer(addr string) error {
 
 		transport := internal.NewTransport(config)
 
-		req.Header.Del(ConfigurationHeaderKey)
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
 
@@ -56,8 +58,10 @@ func StartServer(addr string) error {
 
 		// Write the response (back to burp).
 		for k := range res.Header {
-			v := res.Header.Get(k)
-			w.Header().Add(k, v)
+			vv := res.Header.Values(k)
+			for _, v := range vv {
+				w.Header().Add(k, v)
+			}
 		}
 
 		w.WriteHeader(res.StatusCode)
