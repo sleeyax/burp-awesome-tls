@@ -89,6 +89,17 @@ func NewTransport(config *TransportConfig) *oohttp.StdlibTransport {
 		TLSClientFactory:      tlsFactory.NewUTLSConn,
 	}
 
+	// add realistic initial HTTP2 SETTINGS to Chrome browser fingerprints
+	if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
+		transport.EnableCustomInitialSettings()
+		transport.HeaderTableSize = 65536
+		transport.EnablePush = 0
+		transport.MaxConcurrentStreams = 1000
+		transport.InitialWindowSize = 6291456
+		transport.MaxFrameSize = 16384
+		transport.MaxHeaderListSize = 262144
+	}
+
 	if config.IdleConnTimeout != 0 {
 		transport.IdleConnTimeout = time.Duration(config.IdleConnTimeout) * time.Second
 	}

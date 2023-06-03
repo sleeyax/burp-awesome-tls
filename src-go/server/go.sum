@@ -6,8 +6,8 @@ github.com/klauspost/compress v1.15.15 h1:EF27CXIuDsYJ6mmvtBRlEuB2UVOqHG1tAXgZ7y
 github.com/klauspost/compress v1.15.15/go.mod h1:ZcK2JAFqKOpnBlxcLsJzYfrS9X1akm9fHZNnD9+Vo/4=
 github.com/refraction-networking/utls v1.3.2 h1:o+AkWB57mkcoW36ET7uJ002CpBWHu0KPxi6vzxvPnv8=
 github.com/refraction-networking/utls v1.3.2/go.mod h1:fmoaOww2bxzzEpIKOebIsnBvjQpqP7L2vcm/9KUfm/E=
-github.com/sleeyax/oohttp v0.0.0-20230603093000-5878d39f799b h1:p8IFdGGVs/v7zW/rYB/A9jT1GFfjIbewbcN+KpcfCAs=
-github.com/sleeyax/oohttp v0.0.0-20230603093000-5878d39f799b/go.mod h1:/7fPgmXNkMSXBpLOdARkhyn3vsNAtmZ0C3G5C/KLd6Q=
+github.com/sleeyax/oohttp v0.0.0-20230603105812-6ac0447b1a8e h1:evx5O2TAZdPLDCqPuEI5yo4Sg3LT5cImPVbno6HKM2s=
+github.com/sleeyax/oohttp v0.0.0-20230603105812-6ac0447b1a8e/go.mod h1:/7fPgmXNkMSXBpLOdARkhyn3vsNAtmZ0C3G5C/KLd6Q=
 golang.org/x/crypto v0.5.0 h1:U/0M97KRkSFvyD/3FSmdP5W5swImpNgle/EHFhOsQPE=
 golang.org/x/crypto v0.5.0/go.mod h1:NK/OQwhpMQP3MwtdjgLlYHnH9ebylxKWv3e0fK+mkQU=
 golang.org/x/net v0.10.0 h1:X2//UzNDwYmtCLn7To6G58Wr6f5ahEAQgKNzv9Y951M=
