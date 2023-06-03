@@ -92,7 +92,7 @@ func NewTransport(config *TransportConfig) *oohttp.StdlibTransport {
 	// add realistic initial HTTP2 SETTINGS to Chrome browser fingerprints
 	if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
 		transport.EnableCustomInitialSettings()
-		transport.HeaderTableSize = 65536
+		transport.HeaderTableSize = 4096 // 65536 // TODO: 4096 seems to be the max; modify oohtpp fork (see `http2/hpack` package) to support higher value
 		transport.EnablePush = 0
 		transport.MaxConcurrentStreams = 1000
 		transport.InitialWindowSize = 6291456
