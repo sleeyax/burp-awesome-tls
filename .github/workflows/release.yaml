@@ -1,5 +1,5 @@
 # To test this workflow locally, run the following command:
-# act --use-gitignore=false --bind
+# act --use-gitignore=false
 name: Release binaries
 
 on:
@@ -17,7 +17,7 @@ jobs:
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
         with:
           xgo_version: latest
-          go_version: 1.20
+          go_version: 1.20.0
           dest: build
           pkg: cmd
           prefix: server
