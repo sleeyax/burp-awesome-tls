@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	http "github.com/ooni/oohttp"
 	"io"
 	"net"
-	"server/internal/net/http"
+	"server/internal"
+	"strings"
 )
 
 // DefaultAddress is the default listener address.
@@ -15,7 +17,7 @@ const DefaultAddress string = "127.0.0.1:8887"
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
 // Note that this key can only start with one capital letter and the rest in lowercase.
 // Unfortunately, this seems to be a limitation of Burp's Extender API.
-const ConfigurationHeaderKey = "Goroundtripperconfig"
+const ConfigurationHeaderKey = "Awesometlsconfig"
 
 var s *http.Server
 
@@ -30,41 +32,56 @@ func StartServer(addr string) error {
 	}
 
 	m := http.NewServeMux()
-	m.HandleFunc("/", func(respWriter http.ResponseWriter, req *http.Request) {
+	m.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		http.EnableHeaderOrder(w)
+
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
-
-		rt, err := NewRoundTripperFromJson(configHeader)
-		if err != nil {
-			writeError(respWriter, err)
-			return
-		}
-
 		req.Header.Del(ConfigurationHeaderKey)
 
-		res, err := rt.RoundTrip(req)
+		config, err := internal.ParseTransportConfig(configHeader)
 		if err != nil {
-			writeError(respWriter, err)
+			writeError(w, err)
 			return
 		}
+
+		transport := internal.NewTransport(config)
+
+		req.URL.Host = config.Host
+		req.URL.Scheme = config.Scheme
+		if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
+			pHeaderOrder := []string{":method", ":authority", ":scheme", ":path"}
+			for _, pHeader := range pHeaderOrder {
+				req.Header.Add(http.PHeaderOrderKey, pHeader)
+			}
+		}
+
+		res, err := transport.RoundTrip(req)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
 		defer res.Body.Close()
 
 		// Write the response (back to burp).
-		for key, _ := range res.Header {
-			values := res.Header.Values(key)
-			for _, val := range values {
-				respWriter.Header().Add(key, val)
+		for k := range res.Header {
+			vv := res.Header.Values(k)
+			for _, v := range vv {
+				w.Header().Add(k, v)
 			}
 		}
-		respWriter.WriteHeader(res.StatusCode)
+
+		w.WriteHeader(res.StatusCode)
+
 		body, _ := io.ReadAll(res.Body)
-		respWriter.Write(body)
+		w.Write(body)
 	})
 
 	s.Addr = addr
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{
-			tls.Certificate{
+			{
 				Certificate: [][]byte{ca.Raw},
 				PrivateKey:  private,
 				Leaf:        ca,
