@@ -1,3 +1,5 @@
+# To test this workflow locally, run the following command:
+# act --use-gitignore=false --bind
 name: Release binaries
 
 on:
@@ -9,9 +11,9 @@ jobs:
     name: Build and release binaries
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Execute CGO builds using XGO
-        uses: crazy-max/ghaction-xgo@v1
+        uses: crazy-max/ghaction-xgo@v2
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
         with:
           xgo_version: latest
@@ -26,7 +28,7 @@ jobs:
           buildmode: c-shared
           working_dir: ./src-go/server
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'adopt'
