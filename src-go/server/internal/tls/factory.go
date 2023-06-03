@@ -37,7 +37,7 @@ func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config
 		NextProtos:                  config.NextProtos,
 		ServerName:                  config.ServerName,
 		DynamicRecordSizingDisabled: config.DynamicRecordSizingDisabled,
-		InsecureSkipVerify:          config.InsecureSkipVerify,
+		InsecureSkipVerify:          true,
 	}
 
 	return &uconnAdapter{utls.UClient(conn, uConfig, *clientHelloID)}
