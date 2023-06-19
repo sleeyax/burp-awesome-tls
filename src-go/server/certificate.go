@@ -17,8 +17,10 @@ import (
 
 // Based on: https://github.com/ulixee/hero/blob/main/mitm-socket/go/generate_cert.go
 
-var caFile string = "ca.der"
-var caKeyFile string = "caKey.der"
+var (
+	caFile    string = "ca.der"
+	caKeyFile string = "caKey.der"
+)
 
 // While generating a new certificate, in order to get a unique serial
 // number every time we increment this value.
@@ -116,7 +118,7 @@ func NewCertificateAuthority() (*x509.Certificate, *rsa.PrivateKey, error) {
 		return nil, nil, err
 	}
 
-	err = os.WriteFile(caFile, raw, 0600)
+	err = os.WriteFile(caFile, raw, 0o600)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -126,7 +128,7 @@ func NewCertificateAuthority() (*x509.Certificate, *rsa.PrivateKey, error) {
 		return nil, nil, err
 	}
 
-	err = os.WriteFile(caKeyFile, privBytes, 0600)
+	err = os.WriteFile(caKeyFile, privBytes, 0o600)
 	if err != nil {
 		return nil, nil, err
 	}

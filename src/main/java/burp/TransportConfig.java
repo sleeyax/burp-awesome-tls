@@ -20,6 +20,11 @@ public class TransportConfig {
      */
     public String Fingerprint;
 
+    /*
+     * Hexadecimal Client Hello
+     */
+    public String HexClientHello;
+
     /**
      * The maximum amount of time a dial will wait for a connect to complete.
      * Defaults to [DefaultHttpTimeout].

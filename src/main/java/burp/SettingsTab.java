@@ -24,6 +24,8 @@ public class SettingsTab implements ITab {
     private JSpinner spinnerIdleConnTimeout;
     private JLabel labelTlsHandshakeTimeout;
     private JSpinner spinnerTlsHandshakeTimeout;
+    private JLabel labelHexClientHello;
+    private JTextField textFieldHexClientHello;
 
     @Override
     public String getTabCaption() {
@@ -37,6 +39,7 @@ public class SettingsTab implements ITab {
 
     public SettingsTab(Settings settings) {
         textFieldAddress.setText(settings.getAddress());
+        textFieldHexClientHello.setText(settings.getHexClientHello());
 
         spinnerHttpTimout.setValue(settings.getHttpTimeout());
         spinnerKeepAlive.setValue(settings.getHttpKeepAliveInterval());
@@ -53,6 +56,7 @@ public class SettingsTab implements ITab {
             public void actionPerformed(ActionEvent e) {
                 settings.setAddress(textFieldAddress.getText());
                 settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
+                settings.setHexClientHello(textFieldHexClientHello.getText());
                 settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
                 settings.setIdleConnTimeout((int) spinnerIdleConnTimeout.getValue());
                 settings.setHttpKeepAliveInterval((int) spinnerKeepAlive.getValue());
@@ -77,9 +81,9 @@ public class SettingsTab implements ITab {
      */
     private void $$$setupUI$$$() {
         panelMain = new JPanel();
-        panelMain.setLayout(new GridLayoutManager(16, 6, new Insets(0, 0, 0, 0), -1, -1));
+        panelMain.setLayout(new GridLayoutManager(17, 7, new Insets(0, 0, 0, 0), -1, -1));
         final Spacer spacer1 = new Spacer();
-        panelMain.add(spacer1, new GridConstraints(15, 1, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panelMain.add(spacer1, new GridConstraints(16, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         labelAddress = new JLabel();
         labelAddress.setRequestFocusEnabled(false);
         labelAddress.setText("Listener address:");
@@ -87,43 +91,49 @@ public class SettingsTab implements ITab {
         panelMain.add(labelAddress, new GridConstraints(0, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldAddress = new JTextField();
         textFieldAddress.setToolTipText("Local address the HTTPS server should listen on. Requires extension reload.");
-        panelMain.add(textFieldAddress, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        panelMain.add(textFieldAddress, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         labelTimeout = new JLabel();
         labelTimeout.setText("Http connection timeout (seconds)");
-        panelMain.add(labelTimeout, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelTimeout, new GridConstraints(7, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerHttpTimout = new JSpinner();
         spinnerHttpTimout.setToolTipText("The maximum amount of time a dial will wait for a connect to complete.");
-        panelMain.add(spinnerHttpTimout, new GridConstraints(7, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(spinnerHttpTimout, new GridConstraints(8, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelKeepAlive = new JLabel();
         labelKeepAlive.setText("Http keep alive interval");
-        panelMain.add(labelKeepAlive, new GridConstraints(8, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelKeepAlive, new GridConstraints(9, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelFingerprint = new JLabel();
         labelFingerprint.setEnabled(true);
         labelFingerprint.setHorizontalAlignment(10);
         labelFingerprint.setText("Fingerprint:");
         labelFingerprint.setVerticalAlignment(0);
         labelFingerprint.setVerticalTextPosition(0);
-        panelMain.add(labelFingerprint, new GridConstraints(2, 0, 1, 4, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelFingerprint, new GridConstraints(2, 0, 1, 5, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         comboBoxFingerprint = new JComboBox();
-        panelMain.add(comboBoxFingerprint, new GridConstraints(3, 0, 3, 6, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(comboBoxFingerprint, new GridConstraints(3, 0, 2, 7, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerKeepAlive = new JSpinner();
         spinnerKeepAlive.setToolTipText("Specifies the interval between keep-alive probes for an active network connection.");
-        panelMain.add(spinnerKeepAlive, new GridConstraints(9, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(spinnerKeepAlive, new GridConstraints(10, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelIdleConnTimeout = new JLabel();
         labelIdleConnTimeout.setText("Idle connection timeout");
-        panelMain.add(labelIdleConnTimeout, new GridConstraints(10, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelIdleConnTimeout, new GridConstraints(11, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerIdleConnTimeout = new JSpinner();
         spinnerIdleConnTimeout.setToolTipText("The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself.");
-        panelMain.add(spinnerIdleConnTimeout, new GridConstraints(11, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(spinnerIdleConnTimeout, new GridConstraints(12, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelTlsHandshakeTimeout = new JLabel();
         labelTlsHandshakeTimeout.setText("TLS handshake timeout");
-        panelMain.add(labelTlsHandshakeTimeout, new GridConstraints(12, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(labelTlsHandshakeTimeout, new GridConstraints(13, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerTlsHandshakeTimeout = new JSpinner();
         spinnerTlsHandshakeTimeout.setToolTipText("The maximum amount of time to wait for a TLS handshake.");
-        panelMain.add(spinnerTlsHandshakeTimeout, new GridConstraints(13, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(spinnerTlsHandshakeTimeout, new GridConstraints(14, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         buttonSave = new JButton();
         buttonSave.setText("Save all settings");
-        panelMain.add(buttonSave, new GridConstraints(14, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelMain.add(buttonSave, new GridConstraints(15, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        labelHexClientHello = new JLabel();
+        labelHexClientHello.setText("Hex Client Hello");
+        panelMain.add(labelHexClientHello, new GridConstraints(5, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textFieldHexClientHello = new JTextField();
+        textFieldHexClientHello.setToolTipText("Custom client hello in hex stream.");
+        panelMain.add(textFieldHexClientHello, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     }
 
     /**
@@ -132,5 +142,4 @@ public class SettingsTab implements ITab {
     public JComponent $$$getRootComponent$$$() {
         return panelMain;
     }
-
 }

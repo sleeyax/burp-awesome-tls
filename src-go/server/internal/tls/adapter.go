@@ -3,12 +3,14 @@ package tls
 import (
 	"context"
 	"crypto/tls"
+
 	utls "github.com/refraction-networking/utls"
 )
 
 // uconnAdapter is an adapter from utls.UConn to oohttp.TLSConn.
 type uconnAdapter struct {
 	*utls.UConn
+	spec *utls.ClientHelloSpec
 }
 
 // ConnectionState implements TLSConn's ConnectionState.
@@ -33,6 +35,12 @@ func (c *uconnAdapter) ConnectionState() tls.ConnectionState {
 
 // HandshakeContext implements TLSConn's HandshakeContext.
 func (c *uconnAdapter) HandshakeContext(ctx context.Context) error {
+	if c.spec != nil {
+		if err := c.UConn.ApplyPreset(c.spec); err != nil {
+			return err
+		}
+	}
+
 	ch := make(chan error, 1)
 
 	go func() {
