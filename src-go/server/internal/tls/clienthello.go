@@ -23,7 +23,7 @@ func (hexClientHello HexClientHello) ToClientHelloId() (*utls.ClientHelloSpec, e
 	fingerprinter := &utls.Fingerprinter{}
 	spec, err := fingerprinter.RawClientHello(raw)
 	if err != nil {
-		return nil, fmt.Errorf("FingerprintClientHello: %s", err)
+		return nil, fmt.Errorf("FingerprintClientHello: %w", err)
 	}
 
 	return spec, nil

@@ -83,7 +83,7 @@ func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 	if config.HexClientHello != "" {
 		spec, err := config.HexClientHello.ToClientHelloId()
 		if err != nil {
-			return nil, fmt.Errorf("create spec from client hello: %s", err.Error())
+			return nil, fmt.Errorf("create spec from client hello: %w", err)
 		}
 		tlsFactory.ClientHelloSpec = spec
 	} else if config.Fingerprint != "" {
