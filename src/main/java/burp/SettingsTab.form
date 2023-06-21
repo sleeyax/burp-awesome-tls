@@ -138,7 +138,7 @@
           </grid>
         </constraints>
         <properties>
-          <toolTipText value="Custom client hello in hex stream."/>
+          <toolTipText value="Custom client hello as hex stream."/>
         </properties>
       </component>
     </children>
