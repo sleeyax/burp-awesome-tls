@@ -123,5 +123,3 @@ func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 		Transport: transport,
 	}, nil
 }
-
-// 5a14b2b27d2a8ef6ac2195f634dc9627
