@@ -4,11 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	http "github.com/ooni/oohttp"
 	"io"
 	"net"
-	"server/internal"
 	"strings"
+
+	"server/internal"
+
+	http "github.com/ooni/oohttp"
 )
 
 // DefaultAddress is the default listener address.
@@ -44,7 +46,11 @@ func StartServer(addr string) error {
 			return
 		}
 
-		transport := internal.NewTransport(config)
+		transport, err := internal.NewTransport(config)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
 
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme

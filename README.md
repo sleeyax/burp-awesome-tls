@@ -34,7 +34,10 @@ This magic header is stripped from the request before it's forwarded to the dest
 3. Check your new 'Awesome TLS' tab in Burp for configuration settings and start hacking!
 
 ## Configuration
-This extension is 'plug and play' and should speak for itself. You can hover with your mouse over each field in the 'Awesome TLS' tab for more information about each field. 
+This extension is 'plug and play' and should speak for itself. You can hover with your mouse over each field in the 'Awesome TLS' tab for more information about each field.
+
+To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
+![screenshot](./docs/wireshark_capture_client_hello.png)
 
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 

@@ -1,8 +1,9 @@
 package tls
 
 import (
-	utls "github.com/refraction-networking/utls"
 	"strings"
+
+	utls "github.com/refraction-networking/utls"
 )
 
 type Fingerprint string

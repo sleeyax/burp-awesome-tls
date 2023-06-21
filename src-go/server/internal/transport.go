@@ -3,11 +3,14 @@ package internal
 import (
 	"encoding/json"
 	"errors"
-	oohttp "github.com/ooni/oohttp"
+	"fmt"
 	"net"
-	internalTls "server/internal/tls"
 	"strings"
 	"time"
+
+	internalTls "server/internal/tls"
+
+	oohttp "github.com/ooni/oohttp"
 )
 
 const (
@@ -26,6 +29,9 @@ type TransportConfig struct {
 
 	// The TLS fingerprint to use.
 	Fingerprint internalTls.Fingerprint
+
+	// Hexadecimal Client Hello to use
+	HexClientHello internalTls.HexClientHello
 
 	// The maximum amount of time a dial will wait for a connect to complete.
 	// Defaults to [DefaultHttpTimeout].
@@ -59,7 +65,7 @@ func ParseTransportConfig(data string) (*TransportConfig, error) {
 }
 
 // NewTransport creates a new transport using the given configuration.
-func NewTransport(config *TransportConfig) *oohttp.StdlibTransport {
+func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 	dialer := &net.Dialer{
 		Timeout:   DefaultHttpTimeout,
 		KeepAlive: DefaultHttpKeepAlive,
@@ -74,7 +80,13 @@ func NewTransport(config *TransportConfig) *oohttp.StdlibTransport {
 
 	tlsFactory := &internalTls.FactoryWithClientHelloId{}
 
-	if config.Fingerprint != "" {
+	if config.HexClientHello != "" {
+		spec, err := config.HexClientHello.ToClientHelloId()
+		if err != nil {
+			return nil, fmt.Errorf("create spec from client hello: %w", err)
+		}
+		tlsFactory.ClientHelloSpec = spec
+	} else if config.Fingerprint != "" {
 		tlsFactory.ClientHelloID = config.Fingerprint.ToClientHelloId()
 	}
 
@@ -109,5 +121,5 @@ func NewTransport(config *TransportConfig) *oohttp.StdlibTransport {
 
 	return &oohttp.StdlibTransport{
 		Transport: transport,
-	}
+	}, nil
 }

@@ -5,6 +5,7 @@ public class Settings {
 
     private final String address = "Address";
     private final String fingerprint = "Fingerprint";
+    private final String hexClientHello = "HexClientHello";
     private final String httpTimeout = "HttpTimeout";
     private final String httpKeepAliveInterval = "HttpKeepAliveInterval";
     private final String idleConnTimeout = "IdleConnTimeout";
@@ -79,13 +80,15 @@ public class Settings {
         this.write(this.httpKeepAliveInterval, String.valueOf(httpTimeout));
     }
 
-    public String getFingerprint() {
-        return this.read(this.fingerprint);
-    }
+    public String getFingerprint() { return this.read(this.fingerprint); }
 
     public void setFingerprint(String fingerprint) {
         this.write(this.fingerprint, fingerprint);
     }
+
+    public String getHexClientHello() { return this.read(this.hexClientHello); }
+
+    public void setHexClientHello(String hexClientHello) { this.write(this.hexClientHello, hexClientHello); }
 
     public int getIdleConnTimeout() {
         return Integer.parseInt(this.read(this.idleConnTimeout));

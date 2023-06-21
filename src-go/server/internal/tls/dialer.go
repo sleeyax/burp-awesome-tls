@@ -4,10 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	utls "github.com/refraction-networking/utls"
 	"log"
 	"net"
 	"time"
+
+	utls "github.com/refraction-networking/utls"
 )
 
 // DefaultNetDialer is the default [net.Dialer].
@@ -51,7 +52,7 @@ func (d *Dialer) DialTLSContext(ctx context.Context, network string, addr string
 		d.beforeHandshakeFunc() // useful for testing
 	}
 
-	adapter := (&FactoryWithClientHelloId{d.ClientHelloID}).NewUTLSConn(conn, config)
+	adapter := (&FactoryWithClientHelloId{d.ClientHelloID, nil}).NewUTLSConn(conn, config)
 	if err = adapter.HandshakeContext(ctx); err != nil {
 		conn.Close()
 		return nil, err

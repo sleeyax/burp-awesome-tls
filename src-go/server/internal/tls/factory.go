@@ -2,9 +2,10 @@ package tls
 
 import (
 	"crypto/tls"
+	"net"
+
 	oohttp "github.com/ooni/oohttp"
 	utls "github.com/refraction-networking/utls"
-	"net"
 )
 
 // DefaultClientHelloID is the default [utls.ClientHelloID].
@@ -21,14 +22,17 @@ type ConnFactory interface {
 type FactoryWithClientHelloId struct {
 	// The TLS client hello id (fingerprint) to use.
 	// Defaults to [DefaultClientHelloID].
-	ClientHelloID *utls.ClientHelloID
+	ClientHelloID   *utls.ClientHelloID
+	ClientHelloSpec *utls.ClientHelloSpec
 }
 
 // NewUTLSConn implements ConnFactory.
 func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config) oohttp.TLSConn {
 	clientHelloID := f.ClientHelloID
 
-	if clientHelloID == nil {
+	if f.ClientHelloSpec != nil {
+		clientHelloID = &utls.HelloCustom
+	} else if clientHelloID == nil {
 		clientHelloID = DefaultClientHelloID
 	}
 
@@ -40,5 +44,5 @@ func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config
 		InsecureSkipVerify:          true,
 	}
 
-	return &uconnAdapter{utls.UClient(conn, uConfig, *clientHelloID)}
+	return &uconnAdapter{UConn: utls.UClient(conn, uConfig, *clientHelloID), spec: f.ClientHelloSpec}
 }
