@@ -30,12 +30,12 @@ type FactoryWithClientHelloId struct {
 func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config) oohttp.TLSConn {
 	clientHelloID := f.ClientHelloID
 
-	if clientHelloID == nil {
+        if f.ClientHelloSpec != nil {
+		clientHelloID = &utls.HelloCustom
+	} else if clientHelloID == nil {
 		clientHelloID = DefaultClientHelloID
 	}
-	if f.ClientHelloSpec != nil {
-		clientHelloID = &utls.HelloCustom
-	}
+	
 
 	uConfig := &utls.Config{
 		RootCAs:                     config.RootCAs,
