@@ -132,7 +132,7 @@ public class SettingsTab implements ITab {
         labelHexClientHello.setText("Hex Client Hello");
         panelMain.add(labelHexClientHello, new GridConstraints(5, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldHexClientHello = new JTextField();
-        textFieldHexClientHello.setToolTipText("Custom client hello in hex stream.");
+        textFieldHexClientHello.setToolTipText("Custom client hello as hex stream.");
         panelMain.add(textFieldHexClientHello, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     }
 

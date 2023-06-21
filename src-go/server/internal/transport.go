@@ -2,6 +2,8 @@ package internal
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -9,7 +11,6 @@ import (
 	internalTls "server/internal/tls"
 
 	oohttp "github.com/ooni/oohttp"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -82,7 +83,7 @@ func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 	if config.HexClientHello != "" {
 		spec, err := config.HexClientHello.ToClientHelloId()
 		if err != nil {
-			return nil, errors.Wrap(err, "create spec from client hello")
+			return nil, fmt.Errorf("create spec from client hello: %s", err.Error())
 		}
 		tlsFactory.ClientHelloSpec = spec
 	} else if config.Fingerprint != "" {
