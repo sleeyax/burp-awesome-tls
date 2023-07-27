@@ -34,7 +34,7 @@ func init() {
 }
 
 func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
-	snifferServer, err := newInterceptProxy(interceptAddr, burpAddr)
+	interceptServer, err := newInterceptProxy(interceptAddr, burpAddr)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
 			return
 		}
 
-		transport, err := internal.NewTransport(config, snifferServer.getTLSFingerprint)
+		transport, err := internal.NewTransport(config, interceptServer.getTLSFingerprint)
 		if err != nil {
 			writeError(w, err)
 			return
