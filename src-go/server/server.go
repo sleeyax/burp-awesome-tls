@@ -34,7 +34,10 @@ func init() {
 }
 
 func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
-	snifferServer := newInterceptProxy(interceptAddr, burpAddr)
+	snifferServer, err := newInterceptProxy(interceptAddr, burpAddr)
+	if err != nil {
+		return err
+	}
 
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {

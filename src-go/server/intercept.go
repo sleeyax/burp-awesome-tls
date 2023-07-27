@@ -19,10 +19,10 @@ type interceptProxy struct {
 	l               net.Listener
 }
 
-func newInterceptProxy(interceptAddr, burpAddr string) *interceptProxy {
+func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) {
 	l, err := net.Listen("tcp", interceptAddr)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	s := interceptProxy{
@@ -34,7 +34,7 @@ func newInterceptProxy(interceptAddr, burpAddr string) *interceptProxy {
 
 	go s.start()
 
-	return &s
+	return &s, nil
 }
 
 func (s *interceptProxy) getTLSFingerprint(sni string) string {
