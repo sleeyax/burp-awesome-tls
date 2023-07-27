@@ -10,7 +10,7 @@ import (
 
 type HexClientHello string
 
-func (hexClientHello HexClientHello) ToClientHelloId() (*utls.ClientHelloSpec, error) {
+func (hexClientHello HexClientHello) ToClientHelloSpec() (*utls.ClientHelloSpec, error) {
 	if hexClientHello == "" {
 		return nil, errors.New("empty client hello")
 	}

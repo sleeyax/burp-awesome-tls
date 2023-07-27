@@ -4,6 +4,8 @@ github.com/gaukas/godicttls v0.0.3 h1:YNDIf0d9adcxOijiLrEzpfZGAkNwLRzPaG6OjU7EIT
 github.com/gaukas/godicttls v0.0.3/go.mod h1:l6EenT4TLWgTdwslVb4sEMOCf7Bv0JAK67deKr9/NCI=
 github.com/klauspost/compress v1.15.15 h1:EF27CXIuDsYJ6mmvtBRlEuB2UVOqHG1tAXgZ7yIO+lw=
 github.com/klauspost/compress v1.15.15/go.mod h1:ZcK2JAFqKOpnBlxcLsJzYfrS9X1akm9fHZNnD9+Vo/4=
+github.com/open-ch/ja3 v1.0.1 h1:kMqfkgS+cTasMlsQaJ627qlw7kA/qRZVTmF0BtFjOLQ=
+github.com/open-ch/ja3 v1.0.1/go.mod h1:lTWgltvZDGQjIa/TjWTzfpCVa/eGP+szng2DWz9mAvk=
 github.com/refraction-networking/utls v1.3.2 h1:o+AkWB57mkcoW36ET7uJ002CpBWHu0KPxi6vzxvPnv8=
 github.com/refraction-networking/utls v1.3.2/go.mod h1:fmoaOww2bxzzEpIKOebIsnBvjQpqP7L2vcm/9KUfm/E=
 github.com/sleeyax/oohttp v0.0.0-20230603105812-6ac0447b1a8e h1:evx5O2TAZdPLDCqPuEI5yo4Sg3LT5cImPVbno6HKM2s=

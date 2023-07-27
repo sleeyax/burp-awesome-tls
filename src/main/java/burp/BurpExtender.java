@@ -33,7 +33,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         callbacks.addSuiteTab(new SettingsTab(this.settings));
 
         new Thread(() -> {
-            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getAddress());
+            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getInterceptProxyAddress(), this.settings.getBurpProxyAddress(), this.settings.getEmulateProxyAddress());
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;
@@ -59,6 +59,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
         transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
         transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
+        transportConfig.UseInterceptedFingerprint = this.settings.getUseInterceptedFingerprint();
         var goConfigJSON = this.gson.toJson(transportConfig);
         this.stdout.println("Using config: " + goConfigJSON);
 
@@ -66,7 +67,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         headers.add(HEADER_KEY + ": " + goConfigJSON);
 
         try {
-            var url = new URL("https://" + this.settings.getAddress());
+            var url = new URL("https://" + this.settings.getEmulateProxyAddress());
             messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
             messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
         } catch (Exception e) {

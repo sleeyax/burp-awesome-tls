@@ -25,6 +25,11 @@ public class TransportConfig {
      */
     public String HexClientHello;
 
+    /*
+     * Use intercepted fingerprint from request;
+     */
+    public Boolean UseInterceptedFingerprint;
+
     /**
      * The maximum amount of time a dial will wait for a connect to complete.
      * Defaults to [DefaultHttpTimeout].

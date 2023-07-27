@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	utls "github.com/refraction-networking/utls"
+
 	internalTls "server/internal/tls"
 
 	oohttp "github.com/ooni/oohttp"
@@ -48,6 +50,9 @@ type TransportConfig struct {
 	// The maximum amount of time to wait for a TLS handshake.
 	// Defaults to [DefaultTLSHandshakeTimeout].
 	TLSHandshakeTimeout int
+
+	// UseInterceptedFingerprint use intercepted fingerprint
+	UseInterceptedFingerprint bool
 }
 
 func ParseTransportConfig(data string) (*TransportConfig, error) {
@@ -65,7 +70,7 @@ func ParseTransportConfig(data string) (*TransportConfig, error) {
 }
 
 // NewTransport creates a new transport using the given configuration.
-func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
+func NewTransport(config *TransportConfig, getInterceptedFingerprint func(sni string) string) (*oohttp.StdlibTransport, error) {
 	dialer := &net.Dialer{
 		Timeout:   DefaultHttpTimeout,
 		KeepAlive: DefaultHttpKeepAlive,
@@ -78,17 +83,36 @@ func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 		dialer.KeepAlive = time.Duration(config.HttpKeepAliveInterval) * time.Second
 	}
 
-	tlsFactory := &internalTls.FactoryWithClientHelloId{}
+	var err error
+	var spec *utls.ClientHelloSpec
+	var clientHelloID *utls.ClientHelloID
 
 	if config.HexClientHello != "" {
-		spec, err := config.HexClientHello.ToClientHelloId()
+		spec, err = config.HexClientHello.ToClientHelloSpec()
 		if err != nil {
 			return nil, fmt.Errorf("create spec from client hello: %w", err)
 		}
-		tlsFactory.ClientHelloSpec = spec
-	} else if config.Fingerprint != "" {
-		tlsFactory.ClientHelloID = config.Fingerprint.ToClientHelloId()
+		clientHelloID = &utls.HelloCustom
+	} else {
+		clientHelloID = config.Fingerprint.ToClientHelloId()
 	}
+
+	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
+		interceptedFP := getInterceptedFingerprint(sni)
+
+		if !config.UseInterceptedFingerprint || interceptedFP == "" {
+			return clientHelloID, spec
+		}
+
+		interseptedSpec, err := internalTls.HexClientHello(interceptedFP).ToClientHelloSpec()
+		if err == nil {
+			return &utls.HelloCustom, interseptedSpec
+		}
+
+		return clientHelloID, spec
+	}
+
+	tlsFactory := &internalTls.FactoryWithClientHelloId{GetClientHello: getClientHello}
 
 	transport := &oohttp.Transport{
 		Proxy:                 oohttp.ProxyFromEnvironment,

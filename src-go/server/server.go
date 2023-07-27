@@ -13,8 +13,14 @@ import (
 	http "github.com/ooni/oohttp"
 )
 
-// DefaultAddress is the default listener address.
-const DefaultAddress string = "127.0.0.1:8887"
+const (
+	// DefaultInterceptProxyAddress is the default emulate proxy listener address.
+	DefaultInterceptProxyAddress string = "127.0.0.1:8886"
+	// DefaultBurpProxyAddress is the default emulate proxy listener address.
+	DefaultBurpProxyAddress string = "127.0.0.1:8080"
+	// DefaultEmulateProxyAddress is the default emulate proxy listener address.
+	DefaultEmulateProxyAddress string = "127.0.0.1:8887"
+)
 
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
 // Note that this key can only start with one capital letter and the rest in lowercase.
@@ -27,7 +33,9 @@ func init() {
 	s = &http.Server{}
 }
 
-func StartServer(addr string) error {
+func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
+	snifferServer := newInterceptProxy(interceptAddr, burpAddr)
+
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
 		return err
@@ -46,7 +54,7 @@ func StartServer(addr string) error {
 			return
 		}
 
-		transport, err := internal.NewTransport(config)
+		transport, err := internal.NewTransport(config, snifferServer.getTLSFingerprint)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -83,7 +91,7 @@ func StartServer(addr string) error {
 		w.Write(body)
 	})
 
-	s.Addr = addr
+	s.Addr = emulateAddr
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{
