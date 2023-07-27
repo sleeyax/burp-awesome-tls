@@ -132,7 +132,6 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 				fmt.Println(err)
 			} else {
 				s.m.Lock()
-				fmt.Println(hex.EncodeToString(clientHello))
 				s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
 				s.m.Unlock()
 			}
