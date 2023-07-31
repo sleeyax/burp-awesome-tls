@@ -12,11 +12,13 @@ import (
 	"github.com/open-ch/ja3"
 )
 
+const tlsClientHelloMsgType = "16"
+
 type interceptProxy struct {
 	burpAddr        string
-	m               sync.RWMutex
+	mutex           sync.RWMutex
 	clientHelloData map[string]string
-	l               net.Listener
+	listener        net.Listener
 }
 
 func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) {
@@ -27,9 +29,9 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 
 	s := interceptProxy{
 		burpAddr:        burpAddr,
-		m:               sync.RWMutex{},
+		mutex:           sync.RWMutex{},
 		clientHelloData: map[string]string{},
-		l:               l,
+		listener:        l,
 	}
 
 	go s.start()
@@ -38,15 +40,15 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 }
 
 func (s *interceptProxy) getTLSFingerprint(sni string) string {
-	s.m.RLock()
-	defer s.m.RUnlock()
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 
 	return s.clientHelloData[sni]
 }
 
 func (s *interceptProxy) start() {
 	for {
-		conn, err := s.l.Accept()
+		conn, err := s.listener.Accept()
 		if err != nil {
 			log.Println(err)
 		}
@@ -94,7 +96,7 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 			}
 
 			// catch ClientHello message type
-			if hex.EncodeToString(buf) != "16" {
+			if hex.EncodeToString(buf) != tlsClientHelloMsgType {
 				continue
 			}
 
@@ -131,9 +133,9 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				s.m.Lock()
+				s.mutex.Lock()
 				s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
-				s.m.Unlock()
+				s.mutex.Unlock()
 			}
 		}
 	}()
