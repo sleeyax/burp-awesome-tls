@@ -15,7 +15,7 @@ import (
 
 const (
 	// DefaultInterceptProxyAddress is the default emulate proxy listener address.
-	DefaultInterceptProxyAddress string = ":8886"
+	DefaultInterceptProxyAddress string = "127.0.0.1:8886"
 	// DefaultBurpProxyAddress is the default emulate proxy listener address.
 	DefaultBurpProxyAddress string = "127.0.0.1:8080"
 	// DefaultEmulateProxyAddress is the default emulate proxy listener address.
@@ -29,12 +29,18 @@ const ConfigurationHeaderKey = "Awesometlsconfig"
 
 var s *http.Server
 
+type ListenAddresses struct {
+	InterceptAddr string
+	BurpAddr      string
+	EmulateAddr   string
+}
+
 func init() {
 	s = &http.Server{}
 }
 
-func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
-	interceptServer, err := newInterceptProxy(interceptAddr, burpAddr)
+func StartServer(addresses ListenAddresses) error {
+	interceptServer, err := newInterceptProxy(addresses.InterceptAddr, addresses.BurpAddr)
 	if err != nil {
 		return err
 	}
@@ -94,7 +100,7 @@ func StartServer(interceptAddr, burpAddr, emulateAddr string) error {
 		w.Write(body)
 	})
 
-	s.Addr = emulateAddr
+	s.Addr = addresses.EmulateAddr
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{

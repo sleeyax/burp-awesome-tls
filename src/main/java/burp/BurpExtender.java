@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener {
+public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener, IProxyListener {
     private PrintWriter stdout;
     private PrintWriter stderr;
     private Gson gson;
@@ -29,11 +30,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
         callbacks.setExtensionName("Awesome TLS");
         callbacks.registerHttpListener(this);
+        callbacks.registerProxyListener(this);
         callbacks.registerExtensionStateListener(this);
         callbacks.addSuiteTab(new SettingsTab(this.settings));
 
         new Thread(() -> {
-            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getInterceptProxyAddress(), this.settings.getBurpProxyAddress(), this.settings.getEmulateProxyAddress());
+            var err = ServerLibrary.INSTANCE.StartServer(
+                this.settings.getInterceptProxyAddress(),
+                this.settings.getBurpProxyAddress(),
+                this.settings.getEmulateProxyAddress());
+
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;
@@ -81,6 +87,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var err = ServerLibrary.INSTANCE.StopServer();
         if (!err.equals("")) {
             this.stderr.println(err);
+        }
+    }
+
+    @Override
+    public void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message) {
+        if (message.getMessageInfo().getHttpService().getHost().equals("awesome-tls-error")) {
+            var bodyOffset = this.helpers.analyzeRequest(message.getMessageInfo().getRequest()).getBodyOffset();
+            var req = message.getMessageInfo().getRequest();
+            var body = Arrays.copyOfRange(req, bodyOffset, req.length);
+            this.stderr.println(new String(body, StandardCharsets.UTF_8));
         }
     }
 }

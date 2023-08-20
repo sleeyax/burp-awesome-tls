@@ -31,6 +31,10 @@ public class SettingsTab implements ITab {
     private JLabel labelInterceptProxyAddress;
     private JLabel labelBurpProxyAddress;
     private JRadioButton radioButtonUseInterceptedFingerprint;
+    private JTabbedPane tabbedPaneTab;
+    private JPanel panelSettings;
+    private JPanel panelAdvanced;
+    private JButton buttonSaveAdvanced;
 
     @Override
     public String getTabCaption() {
@@ -61,18 +65,42 @@ public class SettingsTab implements ITab {
         buttonSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                settings.setEmulateProxyAddress(textFieldEmulateProxyAddress.getText());
-                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
-                settings.setBurpProxyAddress(textFieldEmulateProxyAddress.getText());
-                settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
-                settings.setHexClientHello(textFieldHexClientHello.getText());
-                settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
-                settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
-                settings.setIdleConnTimeout((int) spinnerIdleConnTimeout.getValue());
-                settings.setHttpKeepAliveInterval((int) spinnerKeepAlive.getValue());
-                settings.setTlsHandshakeTimeout((int) spinnerTlsHandshakeTimeout.getValue());
+                SaveSettings(settings);
+//                settings.setEmulateProxyAddress(textFieldEmulateProxyAddress.getText());
+//                settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
+//                settings.setHexClientHello(textFieldHexClientHello.getText());
+//                settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
+//                settings.setIdleConnTimeout((int) spinnerIdleConnTimeout.getValue());
+//                settings.setHttpKeepAliveInterval((int) spinnerKeepAlive.getValue());
+//                settings.setTlsHandshakeTimeout((int) spinnerTlsHandshakeTimeout.getValue());
+//                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
+//                settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
+//                settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
             }
         });
+
+        buttonSaveAdvanced.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SaveSettings(settings);
+//                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
+//                settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
+//                settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
+            }
+        });
+    }
+
+    private void SaveSettings(Settings settings) {
+        settings.setEmulateProxyAddress(textFieldEmulateProxyAddress.getText());
+        settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
+        settings.setHexClientHello(textFieldHexClientHello.getText());
+        settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
+        settings.setIdleConnTimeout((int) spinnerIdleConnTimeout.getValue());
+        settings.setHttpKeepAliveInterval((int) spinnerKeepAlive.getValue());
+        settings.setTlsHandshakeTimeout((int) spinnerTlsHandshakeTimeout.getValue());
+        settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
+        settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
+        settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
     }
 
     {
@@ -91,77 +119,94 @@ public class SettingsTab implements ITab {
      */
     private void $$$setupUI$$$() {
         panelMain = new JPanel();
-        panelMain.setLayout(new GridLayoutManager(22, 7, new Insets(0, 0, 0, 0), -1, -1));
-        final Spacer spacer1 = new Spacer();
-        panelMain.add(spacer1, new GridConstraints(21, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        labelInterceptProxyAddress = new JLabel();
-        labelInterceptProxyAddress.setRequestFocusEnabled(false);
-        labelInterceptProxyAddress.setText("Intercept proxy address:");
-        labelInterceptProxyAddress.setToolTipText("");
-        panelMain.add(labelInterceptProxyAddress, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        textFieldInterceptProxyAddress = new JTextField();
-        textFieldInterceptProxyAddress.setToolTipText("Local address the intercept proxy server should listen on. Use it to configure proxy on your client. Requires extension reload.");
-        panelMain.add(textFieldInterceptProxyAddress, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelBurpProxyAddress = new JLabel();
-        labelBurpProxyAddress.setRequestFocusEnabled(false);
-        labelBurpProxyAddress.setText("Burp proxy address:");
-        labelBurpProxyAddress.setToolTipText("");
-        panelMain.add(labelBurpProxyAddress, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        textFieldBurpProxyAddress = new JTextField();
-        panelMain.add(textFieldBurpProxyAddress, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        panelMain.setLayout(new GridLayoutManager(3, 5, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPaneTab = new JTabbedPane();
+        panelMain.add(tabbedPaneTab, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        panelSettings = new JPanel();
+        panelSettings.setLayout(new GridLayoutManager(17, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPaneTab.addTab("settings", panelSettings);
         labelEmulateProxyAddress = new JLabel();
         labelEmulateProxyAddress.setRequestFocusEnabled(false);
-        labelEmulateProxyAddress.setText("Emulate proxy address:");
+        labelEmulateProxyAddress.setText("Listen address:");
         labelEmulateProxyAddress.setToolTipText("");
-        panelMain.add(labelEmulateProxyAddress, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelEmulateProxyAddress, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldEmulateProxyAddress = new JTextField();
         textFieldEmulateProxyAddress.setToolTipText("Local address the emulate proxy server should listen on. Requires extension reload.");
-        panelMain.add(textFieldEmulateProxyAddress, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        panelSettings.add(textFieldEmulateProxyAddress, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         labelFingerprint = new JLabel();
         labelFingerprint.setEnabled(true);
         labelFingerprint.setHorizontalAlignment(10);
         labelFingerprint.setText("Fingerprint:");
         labelFingerprint.setVerticalAlignment(0);
         labelFingerprint.setVerticalTextPosition(0);
-        panelMain.add(labelFingerprint, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelFingerprint, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         comboBoxFingerprint = new JComboBox();
-        panelMain.add(comboBoxFingerprint, new GridConstraints(7, 0, 2, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(comboBoxFingerprint, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelHexClientHello = new JLabel();
         labelHexClientHello.setText("Hex Client Hello");
-        panelMain.add(labelHexClientHello, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelHexClientHello, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textFieldHexClientHello = new JTextField();
         textFieldHexClientHello.setToolTipText("Custom client hello as hex stream.");
-        panelMain.add(textFieldHexClientHello, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        radioButtonUseInterceptedFingerprint = new JRadioButton();
-        radioButtonUseInterceptedFingerprint.setText("Use intercepted tls fingerprint");
-        panelMain.add(radioButtonUseInterceptedFingerprint, new GridConstraints(11, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(textFieldHexClientHello, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         labelTimeout = new JLabel();
         labelTimeout.setText("Http connection timeout (seconds)");
-        panelMain.add(labelTimeout, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelTimeout, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerHttpTimout = new JSpinner();
         spinnerHttpTimout.setToolTipText("The maximum amount of time a dial will wait for a connect to complete.");
-        panelMain.add(spinnerHttpTimout, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(spinnerHttpTimout, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelKeepAlive = new JLabel();
         labelKeepAlive.setText("Http keep alive interval");
-        panelMain.add(labelKeepAlive, new GridConstraints(14, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelKeepAlive, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerKeepAlive = new JSpinner();
         spinnerKeepAlive.setToolTipText("Specifies the interval between keep-alive probes for an active network connection.");
-        panelMain.add(spinnerKeepAlive, new GridConstraints(15, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(spinnerKeepAlive, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelIdleConnTimeout = new JLabel();
         labelIdleConnTimeout.setText("Idle connection timeout");
-        panelMain.add(labelIdleConnTimeout, new GridConstraints(16, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelIdleConnTimeout, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerIdleConnTimeout = new JSpinner();
         spinnerIdleConnTimeout.setToolTipText("The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself.");
-        panelMain.add(spinnerIdleConnTimeout, new GridConstraints(17, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(spinnerIdleConnTimeout, new GridConstraints(11, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         labelTlsHandshakeTimeout = new JLabel();
         labelTlsHandshakeTimeout.setText("TLS handshake timeout");
-        panelMain.add(labelTlsHandshakeTimeout, new GridConstraints(18, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(labelTlsHandshakeTimeout, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         spinnerTlsHandshakeTimeout = new JSpinner();
         spinnerTlsHandshakeTimeout.setToolTipText("The maximum amount of time to wait for a TLS handshake.");
-        panelMain.add(spinnerTlsHandshakeTimeout, new GridConstraints(19, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(spinnerTlsHandshakeTimeout, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         buttonSave = new JButton();
         buttonSave.setText("Save all settings");
-        panelMain.add(buttonSave, new GridConstraints(20, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(buttonSave, new GridConstraints(15, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelSettings.add(panel1, new GridConstraints(16, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panelAdvanced = new JPanel();
+        panelAdvanced.setLayout(new GridLayoutManager(7, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelAdvanced.setToolTipText("");
+        tabbedPaneTab.addTab("advanced", panelAdvanced);
+        labelInterceptProxyAddress = new JLabel();
+        labelInterceptProxyAddress.setEnabled(true);
+        labelInterceptProxyAddress.setText("Intercept proxy address:");
+        panelAdvanced.add(labelInterceptProxyAddress, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textFieldInterceptProxyAddress = new JTextField();
+        textFieldInterceptProxyAddress.setToolTipText("Local address the intercept proxy server should listen on. Use it to configure proxy on your client. Requires extension reload.");
+        panelAdvanced.add(textFieldInterceptProxyAddress, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        labelBurpProxyAddress = new JLabel();
+        labelBurpProxyAddress.setText("Burp proxy address:");
+        panelAdvanced.add(labelBurpProxyAddress, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textFieldBurpProxyAddress = new JTextField();
+        textFieldBurpProxyAddress.setText("");
+        panelAdvanced.add(textFieldBurpProxyAddress, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        radioButtonUseInterceptedFingerprint = new JRadioButton();
+        radioButtonUseInterceptedFingerprint.setText("Use intercepted tls fingerprint");
+        panelAdvanced.add(radioButtonUseInterceptedFingerprint, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        buttonSaveAdvanced = new JButton();
+        buttonSaveAdvanced.setHideActionText(false);
+        buttonSaveAdvanced.setText("Save all settings");
+        panelAdvanced.add(buttonSaveAdvanced, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelAdvanced.add(panel2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel2.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -170,4 +215,5 @@ public class SettingsTab implements ITab {
     public JComponent $$$getRootComponent$$$() {
         return panelMain;
     }
+
 }

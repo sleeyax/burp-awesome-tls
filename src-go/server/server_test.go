@@ -3,7 +3,11 @@ package server
 import "testing"
 
 func TestStartServer(t *testing.T) {
-	if err := StartServer(DefaultInterceptProxyAddress, DefaultBurpProxyAddress, DefaultEmulateProxyAddress); err != nil {
+	if err := StartServer(ListenAddresses{
+		BurpAddr:      DefaultBurpProxyAddress,
+		EmulateAddr:   DefaultEmulateProxyAddress,
+		InterceptAddr: DefaultInterceptProxyAddress,
+	}); err != nil {
 		t.Fatal(err)
 	}
 

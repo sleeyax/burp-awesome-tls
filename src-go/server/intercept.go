@@ -7,14 +7,18 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/url"
+	"strings"
 	"sync"
 
+	http "github.com/ooni/oohttp"
 	"github.com/open-ch/ja3"
 )
 
 const tlsClientHelloMsgType = "16"
 
 type interceptProxy struct {
+	burpClient      *http.Client
 	burpAddr        string
 	mutex           sync.RWMutex
 	clientHelloData map[string]string
@@ -22,21 +26,33 @@ type interceptProxy struct {
 }
 
 func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) {
+	proxyURL, err := url.Parse(fmt.Sprintf("http://%s", burpAddr))
+	if err != nil {
+		return nil, err
+	}
+
+	tr := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	}
+
 	l, err := net.Listen("tcp", interceptAddr)
 	if err != nil {
 		return nil, err
 	}
 
-	s := interceptProxy{
+	proxy := interceptProxy{
+		burpClient: &http.Client{
+			Transport: tr,
+		},
 		burpAddr:        burpAddr,
 		mutex:           sync.RWMutex{},
 		clientHelloData: map[string]string{},
 		listener:        l,
 	}
 
-	go s.start()
+	go proxy.start()
 
-	return &s, nil
+	return &proxy, nil
 }
 
 func (s *interceptProxy) getTLSFingerprint(sni string) string {
@@ -62,6 +78,7 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 	out, err := net.Dial("tcp", s.burpAddr)
 	if err != nil {
+		s.writeError(err)
 		return
 	}
 
@@ -71,28 +88,29 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	var length uint16
 	var clientHello []byte
 
-	r := io.TeeReader(in, out)
+	inReader := io.TeeReader(in, out)
+	outReader := io.TeeReader(out, in)
 
 	var wg sync.WaitGroup
 
 	wg.Add(2)
 
 	go func() {
-		for {
-			var buf []byte
+		defer wg.Done()
 
-			buf = make([]byte, 1)
-			if _, err := r.Read(buf); err != nil {
+		for {
+			if readClientHello {
+				if _, err := io.ReadAll(inReader); err != nil && err != io.EOF {
+					s.writeError(err)
+				}
+
 				return
 			}
 
-			if readClientHello {
-				buf = make([]byte, 1)
-				if _, err := r.Read(buf); err != nil {
-					return
-				}
-
-				continue
+			buf := make([]byte, 1)
+			if _, err = inReader.Read(buf); err != nil {
+				s.writeError(err)
+				return
 			}
 
 			// catch ClientHello message type
@@ -104,7 +122,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 			// read tls version
 			buf = make([]byte, 2)
-			if _, err := r.Read(buf); err != nil {
+			if _, err = inReader.Read(buf); err != nil {
+				s.writeError(err)
 				return
 			}
 
@@ -112,7 +131,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 			// read client hello length
 			buf = make([]byte, 2)
-			if _, err := r.Read(buf); err != nil {
+			if _, err = inReader.Read(buf); err != nil {
+				s.writeError(err)
 				return
 			}
 
@@ -121,7 +141,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 			// read remaining client hello by length
 			buf = make([]byte, length)
-			if _, err := r.Read(buf); err != nil {
+			if _, err = inReader.Read(buf); err != nil {
+				s.writeError(err)
 				return
 			}
 
@@ -131,7 +152,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 			j, err := ja3.ComputeJA3FromSegment(clientHello)
 			if err != nil {
-				fmt.Println(err)
+				s.writeError(err)
+				return
 			} else {
 				s.mutex.Lock()
 				s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
@@ -141,17 +163,29 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	}()
 
 	go func() {
-		for {
-			buf := make([]byte, 1)
-			if _, err := out.Read(buf); err != nil {
-				return
-			}
+		defer wg.Done()
 
-			if _, err := in.Write(buf); err != nil {
-				return
-			}
+		if _, err := io.ReadAll(outReader); err != nil && err != io.EOF {
+			s.writeError(err)
 		}
+
+		return
 	}()
 
 	wg.Wait()
+}
+
+func (s *interceptProxy) writeError(err error) {
+	log.Println(err)
+
+	reqErr := strings.NewReader(fmt.Sprintf("Awesome TLS intercept proxy error: %s", err.Error()))
+	req, err := http.NewRequest("POST", "http://awesome-tls-error", reqErr)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = s.burpClient.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
 }
