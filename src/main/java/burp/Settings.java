@@ -28,17 +28,17 @@ public class Settings {
     }
 
     private void setDefaults() {
-//        if (this.read(this.emulateProxyAddress) == "" || this.read(this.emulateProxyAddress) == null) {
-        this.write(this.emulateProxyAddress, DEFAULT_EMULATE_PROXY_ADDRESS);
-//        }
+       if (this.read(this.emulateProxyAddress) == "" || this.read(this.emulateProxyAddress) == null) {
+           this.write(this.emulateProxyAddress, DEFAULT_EMULATE_PROXY_ADDRESS);
+       }
 
-//        if (this.read(this.interceptProxyAddress) == "" || this.read(this.interceptProxyAddress) == null) {
-        this.write(this.interceptProxyAddress, DEFAULT_INTERCEPT_PROXY_ADDRESS);
-//        }
+       if (this.read(this.interceptProxyAddress) == "" || this.read(this.interceptProxyAddress) == null) {
+           this.write(this.interceptProxyAddress, DEFAULT_INTERCEPT_PROXY_ADDRESS);
+       }
 
-//        if (this.read(this.burpProxyAddress) == "" || this.read(this.burpProxyAddress) == null) {
-        this.write(this.burpProxyAddress, DEFAULT_BURP_PROXY_ADDRESS);
-//        }
+       if (this.read(this.burpProxyAddress) == "" || this.read(this.burpProxyAddress) == null) {
+           this.write(this.burpProxyAddress, DEFAULT_BURP_PROXY_ADDRESS);
+       }
 
         if (this.read(this.fingerprint) == null) {
             this.write(this.fingerprint, DEFAULT_TLS_FINGERPRINT);
