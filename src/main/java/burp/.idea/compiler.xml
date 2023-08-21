@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="CompilerConfiguration">
-    <option name="USE_RELEASE_OPTION" value="false" />
-    <bytecodeTargetLevel target="17">
-      <module name="burp" target="17" />
-    </bytecodeTargetLevel>
-  </component>
-</project>
