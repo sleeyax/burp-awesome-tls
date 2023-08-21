@@ -98,13 +98,13 @@ func NewTransport(config *TransportConfig, getInterceptedFingerprint func(sni st
 	}
 
 	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
-		interceptedFP := getInterceptedFingerprint(sni)
+		interceptedFingerprint := getInterceptedFingerprint(sni)
 
-		if !config.UseInterceptedFingerprint || interceptedFP == "" {
+		if !config.UseInterceptedFingerprint || interceptedFingerprint == "" {
 			return clientHelloID, spec
 		}
 
-		interseptedSpec, err := internalTls.HexClientHello(interceptedFP).ToClientHelloSpec()
+		interseptedSpec, err := internalTls.HexClientHello(interceptedFingerprint).ToClientHelloSpec()
 		if err == nil {
 			return &utls.HelloCustom, interseptedSpec
 		}
