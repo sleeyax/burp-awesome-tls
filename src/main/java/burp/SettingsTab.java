@@ -13,10 +13,10 @@ public class SettingsTab implements ITab {
     private JComboBox comboBoxFingerprint;
     private JPanel panelMain;
     private JLabel labelFingerprint;
-    private JTextField textFieldEmulateProxyAddress;
+    private JTextField textFieldSpoofProxyAddress;
     private JTextField textFieldInterceptProxyAddress;
     private JTextField textFieldBurpProxyAddress;
-    private JLabel labelEmulateProxyAddress;
+    private JLabel labelSpoofProxyAddress;
     private JButton buttonSave;
     private JLabel labelTimeout;
     private JSpinner spinnerHttpTimout;
@@ -49,7 +49,7 @@ public class SettingsTab implements ITab {
     public SettingsTab(Settings settings) {
         textFieldInterceptProxyAddress.setText(settings.getInterceptProxyAddress());
         textFieldBurpProxyAddress.setText(settings.getBurpProxyAddress());
-        textFieldEmulateProxyAddress.setText(settings.getEmulateProxyAddress());
+        textFieldSpoofProxyAddress.setText(settings.getSpoofProxyAddress());
         textFieldHexClientHello.setText(settings.getHexClientHello());
 
         spinnerHttpTimout.setValue(settings.getHttpTimeout());
@@ -66,16 +66,6 @@ public class SettingsTab implements ITab {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SaveSettings(settings);
-//                settings.setEmulateProxyAddress(textFieldEmulateProxyAddress.getText());
-//                settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
-//                settings.setHexClientHello(textFieldHexClientHello.getText());
-//                settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
-//                settings.setIdleConnTimeout((int) spinnerIdleConnTimeout.getValue());
-//                settings.setHttpKeepAliveInterval((int) spinnerKeepAlive.getValue());
-//                settings.setTlsHandshakeTimeout((int) spinnerTlsHandshakeTimeout.getValue());
-//                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
-//                settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
-//                settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
             }
         });
 
@@ -83,15 +73,12 @@ public class SettingsTab implements ITab {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SaveSettings(settings);
-//                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
-//                settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
-//                settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
             }
         });
     }
 
     private void SaveSettings(Settings settings) {
-        settings.setEmulateProxyAddress(textFieldEmulateProxyAddress.getText());
+        settings.setSpoofProxyAddress(textFieldSpoofProxyAddress.getText());
         settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
         settings.setHexClientHello(textFieldHexClientHello.getText());
         settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
@@ -125,14 +112,14 @@ public class SettingsTab implements ITab {
         panelSettings = new JPanel();
         panelSettings.setLayout(new GridLayoutManager(17, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPaneTab.addTab("settings", panelSettings);
-        labelEmulateProxyAddress = new JLabel();
-        labelEmulateProxyAddress.setRequestFocusEnabled(false);
-        labelEmulateProxyAddress.setText("Listen address:");
-        labelEmulateProxyAddress.setToolTipText("");
-        panelSettings.add(labelEmulateProxyAddress, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        textFieldEmulateProxyAddress = new JTextField();
-        textFieldEmulateProxyAddress.setToolTipText("Local address the emulate proxy server should listen on. Requires extension reload.");
-        panelSettings.add(textFieldEmulateProxyAddress, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        labelSpoofProxyAddress = new JLabel();
+        labelSpoofProxyAddress.setRequestFocusEnabled(false);
+        labelSpoofProxyAddress.setText("Listen address:");
+        labelSpoofProxyAddress.setToolTipText("");
+        panelSettings.add(labelSpoofProxyAddress, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textFieldSpoofProxyAddress = new JTextField();
+        textFieldSpoofProxyAddress.setToolTipText("Local address the  proxy server should listen on. Requires extension reload.");
+        panelSettings.add(textFieldSpoofProxyAddress, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         labelFingerprint = new JLabel();
         labelFingerprint.setEnabled(true);
         labelFingerprint.setHorizontalAlignment(10);

@@ -3,7 +3,7 @@ package burp;
 public class Settings {
     private final IBurpExtenderCallbacks callbacks;
 
-    private final String emulateProxyAddress = "EmulateProxyAddress";
+    private final String spoofProxyAddress = "SpoofProxyAddress";
     private final String interceptProxyAddress = "InterceptProxyAddress";
     private final String burpProxyAddress = "BurpProxyAddress";
     private final String fingerprint = "Fingerprint";
@@ -14,7 +14,7 @@ public class Settings {
     private final String idleConnTimeout = "IdleConnTimeout";
     private final String tlsHandshakeTimeout = "TlsHandshakeTimeout";
 
-    public static final String DEFAULT_EMULATE_PROXY_ADDRESS = "127.0.0.1:8887";
+    public static final String DEFAULT_SPOOF_PROXY_ADDRESS = "127.0.0.1:8887";
     public static final String DEFAULT_INTERCEPT_PROXY_ADDRESS = "127.0.0.1:8886";
     public static final String DEFAULT_BURP_PROXY_ADDRESS = "127.0.0.1:8080";
     public static final String DEFAULT_HTTP_TIMEOUT = "30";
@@ -28,8 +28,8 @@ public class Settings {
     }
 
     private void setDefaults() {
-       if (this.read(this.emulateProxyAddress) == "" || this.read(this.emulateProxyAddress) == null) {
-           this.write(this.emulateProxyAddress, DEFAULT_EMULATE_PROXY_ADDRESS);
+       if (this.read(this.spoofProxyAddress) == "" || this.read(this.spoofProxyAddress) == null) {
+           this.write(this.spoofProxyAddress, DEFAULT_SPOOF_PROXY_ADDRESS);
        }
 
        if (this.read(this.interceptProxyAddress) == "" || this.read(this.interceptProxyAddress) == null) {
@@ -69,12 +69,12 @@ public class Settings {
         this.callbacks.saveExtensionSetting(key, value);
     }
 
-    public String getEmulateProxyAddress() {
-        return this.read(this.emulateProxyAddress);
+    public String getSpoofProxyAddress() {
+        return this.read(this.spoofProxyAddress);
     }
 
-    public void setEmulateProxyAddress(String emulateProxyAddress) {
-        this.write(this.emulateProxyAddress, emulateProxyAddress);
+    public void setSpoofProxyAddress(String spoofProxyAddress) {
+        this.write(this.spoofProxyAddress, spoofProxyAddress);
     }
 
     public String getInterceptProxyAddress() {

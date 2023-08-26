@@ -18,8 +18,8 @@ const (
 	DefaultInterceptProxyAddress string = "127.0.0.1:8886"
 	// DefaultBurpProxyAddress is the default emulate proxy listener address.
 	DefaultBurpProxyAddress string = "127.0.0.1:8080"
-	// DefaultEmulateProxyAddress is the default emulate proxy listener address.
-	DefaultEmulateProxyAddress string = "127.0.0.1:8887"
+	// DefaultSpoofProxyAddress is the default emulate proxy listener address.
+	DefaultSpoofProxyAddress string = "127.0.0.1:8887"
 )
 
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
@@ -32,7 +32,7 @@ var s *http.Server
 type ListenAddresses struct {
 	InterceptAddr string
 	BurpAddr      string
-	EmulateAddr   string
+	SpoofAddr     string
 }
 
 func init() {
@@ -100,7 +100,7 @@ func StartServer(addresses ListenAddresses) error {
 		w.Write(body)
 	})
 
-	s.Addr = addresses.EmulateAddr
+	s.Addr = addresses.SpoofAddr
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{

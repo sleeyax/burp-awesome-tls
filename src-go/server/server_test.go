@@ -5,7 +5,7 @@ import "testing"
 func TestStartServer(t *testing.T) {
 	if err := StartServer(ListenAddresses{
 		BurpAddr:      DefaultBurpProxyAddress,
-		EmulateAddr:   DefaultEmulateProxyAddress,
+		SpoofAddr:     DefaultSpoofProxyAddress,
 		InterceptAddr: DefaultInterceptProxyAddress,
 	}); err != nil {
 		t.Fatal(err)

@@ -38,7 +38,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
             var err = ServerLibrary.INSTANCE.StartServer(
                 this.settings.getInterceptProxyAddress(),
                 this.settings.getBurpProxyAddress(),
-                this.settings.getEmulateProxyAddress());
+                this.settings.getSpoofProxyAddress());
 
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
@@ -73,7 +73,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         headers.add(HEADER_KEY + ": " + goConfigJSON);
 
         try {
-            var url = new URL("https://" + this.settings.getEmulateProxyAddress());
+            var url = new URL("https://" + this.settings.getSpoofProxyAddress());
             messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
             messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
         } catch (Exception e) {

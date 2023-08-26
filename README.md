@@ -4,7 +4,7 @@ It boosts the power of Burp Suite while reducing the likelihood of fingerprintin
 
 It does this without resorting to hacks, reflection or forked Burp Suite Community code. All code in this repository only leverages Burp's official Extender API.
 
-![screenshot](./docs/screenshot.png)
+![screenshot](./docs/settings.png)
 
 ## Showcase
 [CloudFlare bot score](https://cloudflare.manfredi.io/en/tools/connection):
@@ -24,7 +24,7 @@ Then, the local server forwards the response back to Burp. The response header o
 Configuration settings and other necessary information like the destination server address and protocol are sent to the local server per request by a magic header.
 This magic header is stripped from the request before it's forwarded to the destination server, of course.
 
-![diagram](./docs/diagram.png)
+![diagram](./docs/basic_diagram.png)
 
 > :information_source: Another option would've been to code an upstream proxy server and connect burp to it, but I personally needed an extension for customization and portability. 
 
@@ -38,6 +38,14 @@ This extension is 'plug and play' and should speak for itself. You can hover wit
 
 To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
 ![screenshot](./docs/wireshark_capture_client_hello.png)
+
+You can also use additional settings to enable a proxy that will automatically get a fingerprint from the request and use it. Thus, the intercept proxy will be raised, which you will have to use on the client
+
+![screenshot](./docs/advanced_settings.png)
+
+After that, the overall structure will look like this:
+
+![diagram](./docs/advanced_diagram.png)
 
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
