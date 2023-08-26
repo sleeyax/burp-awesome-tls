@@ -39,7 +39,7 @@ This extension is 'plug and play' and should speak for itself. You can hover wit
 To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
 ![screenshot](./docs/wireshark_capture_client_hello.png)
 
-You can also use additional settings to enable a proxy that will automatically get a fingerprint from the request and use it. Thus, the intercept proxy will be raised, which you will have to use on the client
+You can also use additional settings to enable a proxy that will automatically get a fingerprint from the request and use it. Thus, the intercept proxy will be raised, which you will have to use on the client.
 
 ![screenshot](./docs/advanced_settings.png)
 

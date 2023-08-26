@@ -13,7 +13,7 @@ import (
 func main() {
 	interceptAddr := flag.String("intercept", server.DefaultInterceptProxyAddress, "Intercept proxy address to listen on ([ip:]port)")
 	burpAddr := flag.String("burp", server.DefaultBurpProxyAddress, "Burp proxy address to listen on ([ip:]port)")
-	emulateAddr := flag.String("emulate", server.DefaultSpoofProxyAddress, "Emulate proxy address to listen on ([ip:]port)")
+	spoofAddr := flag.String("spoof", server.DefaultSpoofProxyAddress, "Spoof proxy address to listen on ([ip:]port)")
 	flag.Parse()
 
 	addresses := server.ListenAddresses{}
@@ -23,19 +23,19 @@ func main() {
 	if burpAddr != nil {
 		addresses.BurpAddr = *burpAddr
 	}
-	if emulateAddr != nil {
-		addresses.SpoofAddr = *emulateAddr
+	if spoofAddr != nil {
+		addresses.SpoofAddr = *spoofAddr
 	}
 
 	log.Fatalln(server.StartServer(addresses))
 }
 
 //export StartServer
-func StartServer(interceptProxy, burpProxy, emulateProxy string) *C.char {
+func StartServer(interceptProxy, burpProxy, spoofProxy string) *C.char {
 	if err := server.StartServer(server.ListenAddresses{
 		InterceptAddr: interceptProxy,
 		BurpAddr:      burpProxy,
-		SpoofAddr:     emulateProxy,
+		SpoofAddr:     spoofProxy,
 	}); err != nil {
 		return C.CString(err.Error())
 	}

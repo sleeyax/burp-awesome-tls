@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	// DefaultInterceptProxyAddress is the default emulate proxy listener address.
+	// DefaultInterceptProxyAddress is the default intercept proxy listener address.
 	DefaultInterceptProxyAddress string = "127.0.0.1:8886"
-	// DefaultBurpProxyAddress is the default emulate proxy listener address.
+	// DefaultBurpProxyAddress is the default burp proxy listener address.
 	DefaultBurpProxyAddress string = "127.0.0.1:8080"
-	// DefaultSpoofProxyAddress is the default emulate proxy listener address.
+	// DefaultSpoofProxyAddress is the default spoof proxy listener address.
 	DefaultSpoofProxyAddress string = "127.0.0.1:8887"
 )
 
