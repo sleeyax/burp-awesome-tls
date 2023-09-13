@@ -35,6 +35,8 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         callbacks.addSuiteTab(new SettingsTab(this.settings));
 
         new Thread(() -> {
+//             this.stdout.println(Platform.RESOURCE_PREFIX);
+
             var err = ServerLibrary.INSTANCE.StartServer(
                 this.settings.getInterceptProxyAddress(),
                 this.settings.getBurpProxyAddress(),

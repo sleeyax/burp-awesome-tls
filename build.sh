@@ -32,7 +32,11 @@ copy() {
   echo "copied $binaryPath to $resourcePath"
 }
 
-copy_macos() {
+copy_macos_arm64() {
+  copy "server.h" "darwin-aarch64"
+}
+
+copy_macos_amd64() {
   copy "server-darwin-amd64.dylib" "darwin-x86-64" "lib"
 }
 
@@ -54,7 +58,11 @@ copy_windows_386() {
 
 # build separate jar files per platform
 cleanup
-copy_macos
+copy_macos_arm64
+buildJar "macos-arm64"
+
+cleanup
+copy_macos_amd64
 buildJar "macos-amd64"
 
 cleanup
@@ -75,7 +83,8 @@ buildJar "windows-i386"
 
 # build single cross-platform fat jar
 cleanup
-copy_macos
+copy_macos_arm64
+copy_macos_amd64
 copy_linux_386
 copy_linux_amd64
 copy_windows_amd64

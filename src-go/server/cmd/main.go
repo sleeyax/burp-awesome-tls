@@ -31,11 +31,11 @@ func main() {
 }
 
 //export StartServer
-func StartServer(interceptProxy, burpProxy, spoofProxy string) *C.char {
+func StartServer(interceptAddr, burpAddr, spoofAddr *C.char) *C.char {
 	if err := server.StartServer(server.ListenAddresses{
-		InterceptAddr: interceptProxy,
-		BurpAddr:      burpProxy,
-		SpoofAddr:     spoofProxy,
+		InterceptAddr: C.GoString(interceptAddr),
+		BurpAddr:      C.GoString(burpAddr),
+		SpoofAddr:     C.GoString(spoofAddr),
 	}); err != nil {
 		return C.CString(err.Error())
 	}
