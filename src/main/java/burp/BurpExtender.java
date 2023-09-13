@@ -37,10 +37,13 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         new Thread(() -> {
 //             this.stdout.println(Platform.RESOURCE_PREFIX);
 
+            this.stdout.println("load");
             var err = ServerLibrary.INSTANCE.StartServer(
                 this.settings.getInterceptProxyAddress(),
                 this.settings.getBurpProxyAddress(),
                 this.settings.getSpoofProxyAddress());
+
+            this.stdout.println("loaded");
 
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
