@@ -36,30 +36,11 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         callbacks.addSuiteTab(new SettingsTab(this.settings));
 
         new Thread(() -> {
-<<<<<<< Updated upstream
-//             this.stdout.println(Platform.RESOURCE_PREFIX);
-
-            this.stdout.println("load");
             var err = ServerLibrary.INSTANCE.StartServer(
                 this.settings.getInterceptProxyAddress(),
                 this.settings.getBurpProxyAddress(),
                 this.settings.getSpoofProxyAddress());
 
-            this.stdout.println("loaded");
-
-=======
-            System.setProperty("jna.library.path", "/Users/vladimir.razdrogin/GolandProjects/burp-awesome-tls/build/resources/main/darwin-aarch64/server.so");
-            this.stdout.println("LOAD");
-
-            try {
-                ServerLibrary INSTANCE = Native.load("server", ServerLibrary.class);
-            } catch (UnsatisfiedLinkError e) {
-                this.stdout.println("Не удалось найти или загрузить библиотеку: " + e);
-            }
-
-            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getAddress());
-            this.stdout.println("LOADED");
->>>>>>> Stashed changes
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;

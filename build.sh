@@ -33,11 +33,7 @@ copy() {
 }
 
 copy_macos_arm64() {
-<<<<<<< Updated upstream
-  copy "server.h" "darwin-aarch64"
-=======
   copy "server-darwin-arm64.dylib" "darwin-aarch64" "lib"
->>>>>>> Stashed changes
 }
 
 copy_macos_amd64() {
@@ -62,13 +58,10 @@ copy_windows_386() {
 
 # build separate jar files per platform
 cleanup
-<<<<<<< Updated upstream
 copy_macos_arm64
 buildJar "macos-arm64"
 
 cleanup
-=======
->>>>>>> Stashed changes
 copy_macos_amd64
 buildJar "macos-amd64"
 

@@ -42,12 +42,12 @@ func init() {
 func StartServer(addresses ListenAddresses) error {
 	interceptServer, err := newInterceptProxy(addresses.InterceptAddr, addresses.BurpAddr)
 	if err != nil {
-		return err
+		return fmt.Errorf("newInterceptProxy, err: %w", err)
 	}
 
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
-		return err
+		return fmt.Errorf("NewCertificateAuthority, err: %w", err)
 	}
 
 	m := http.NewServeMux()
@@ -115,12 +115,16 @@ func StartServer(addresses ListenAddresses) error {
 
 	listener, err := net.Listen("tcp", s.Addr)
 	if err != nil {
-		return err
+		return fmt.Errorf("listen, err: %w", err)
 	}
 
 	tlsListener := tls.NewListener(listener, s.TLSConfig)
 
-	return s.Serve(tlsListener)
+	if err := s.Serve(tlsListener); err != nil {
+		return fmt.Errorf("serve, err: %w", err)
+	}
+
+	return nil
 }
 
 func StopServer() error {

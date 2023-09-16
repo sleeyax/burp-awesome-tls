@@ -32,7 +32,6 @@ func main() {
 
 //export StartServer
 func StartServer(interceptAddr, burpAddr, spoofAddr *C.char) *C.char {
-	return C.CString("TEST")
 	if err := server.StartServer(server.ListenAddresses{
 		InterceptAddr: C.GoString(interceptAddr),
 		BurpAddr:      C.GoString(burpAddr),
