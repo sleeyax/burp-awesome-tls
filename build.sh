@@ -36,6 +36,10 @@ copy_macos() {
   copy "server-darwin-amd64.dylib" "darwin-x86-64" "lib"
 }
 
+copy_macos_arm64() {
+  copy "server-darwin-arm64.dylib" "darwin-aarch64" "lib"
+}
+
 copy_linux_386() {
   copy "server-linux-386.so" "linux-x86"
 }
@@ -58,6 +62,10 @@ copy_macos
 buildJar "macos-amd64"
 
 cleanup
+copy_macos_arm64
+buildJar "macos-arm64"
+
+cleanup
 copy_linux_386
 buildJar "linux-i386"
 
@@ -76,6 +84,7 @@ buildJar "windows-i386"
 # build single cross-platform fat jar
 cleanup
 copy_macos
+copy_macos_arm64
 copy_linux_386
 copy_linux_amd64
 copy_windows_amd64
