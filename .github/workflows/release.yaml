@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Execute CGO builds using XGO
-        uses: crazy-max/ghaction-xgo@v2
+        uses: crazy-max/ghaction-xgo@v3
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
         with:
           xgo_version: latest
@@ -21,7 +21,7 @@ jobs:
           dest: build
           pkg: cmd
           prefix: server
-          targets: windows/386,windows/amd64,linux/386,linux/amd64,darwin/amd64,darwin/arm64
+          targets: windows/386,windows/amd64,linux/386,linux/amd64,linux/arm,linux/arm64,darwin/amd64,darwin/arm64
           # Prints the build commands as compilation progresses (default false)
           x: true
           ldflags: -w
