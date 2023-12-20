@@ -1,5 +1,6 @@
 package server
 
+import "C"
 import (
 	"context"
 	"crypto/tls"
@@ -27,24 +28,17 @@ const (
 // Unfortunately, this seems to be a limitation of Burp's Extender API.
 const ConfigurationHeaderKey = "Awesometlsconfig"
 
-var s *http.Server
-
-type ListenAddresses struct {
-	InterceptAddr string
-	BurpAddr      string
-	SpoofAddr     string
-}
+var (
+	s         *http.Server
+	proxy     *interceptProxy
+	isProxyOn bool
+)
 
 func init() {
 	s = &http.Server{}
 }
 
-func StartServer(addresses ListenAddresses) error {
-	interceptServer, err := newInterceptProxy(addresses.InterceptAddr, addresses.BurpAddr)
-	if err != nil {
-		return fmt.Errorf("newInterceptProxy, err: %w", err)
-	}
-
+func StartServer(addr string) error {
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
 		return fmt.Errorf("NewCertificateAuthority, err: %w", err)
@@ -57,13 +51,13 @@ func StartServer(addresses ListenAddresses) error {
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
 		req.Header.Del(ConfigurationHeaderKey)
 
-		config, err := internal.ParseTransportConfig(configHeader)
+		config, err := internal.ParseRequestConfig(configHeader)
 		if err != nil {
 			writeError(w, err)
 			return
 		}
 
-		transport, err := internal.NewTransport(config, interceptServer.getTLSFingerprint)
+		transport, err := internal.NewTransport(proxy.getTLSFingerprint)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -71,7 +65,7 @@ func StartServer(addresses ListenAddresses) error {
 
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
-		if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
+		if strings.HasPrefix(string(internal.DefaultConfig.Fingerprint), "Chrome") {
 			pHeaderOrder := []string{":method", ":authority", ":scheme", ":path"}
 			for _, pHeader := range pHeaderOrder {
 				req.Header.Add(http.PHeaderOrderKey, pHeader)
@@ -100,7 +94,7 @@ func StartServer(addresses ListenAddresses) error {
 		w.Write(body)
 	})
 
-	s.Addr = addresses.SpoofAddr
+	s.Addr = addr
 	s.Handler = m
 	s.TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{
@@ -125,6 +119,49 @@ func StartServer(addresses ListenAddresses) error {
 	}
 
 	return nil
+}
+
+func SaveSettings(configJson string) error {
+	config, err := internal.ParseTransportConfig(configJson)
+	if err != nil {
+		return err
+	}
+
+	if !isProxyOn && config.UseInterceptedFingerprint {
+		if err = StartProxy(config.InterceptProxyAddr, config.BurpAddr); err != nil {
+			return err
+		}
+		isProxyOn = true
+	} else if isProxyOn && !config.UseInterceptedFingerprint {
+		if err = StopProxy(); err != nil {
+			return err
+		}
+		isProxyOn = false
+	}
+
+	internal.DefaultConfig = *config
+
+	return nil
+}
+
+func StartProxy(interceptAddr, burpAddr string) (err error) {
+	p, err := newInterceptProxy(interceptAddr, burpAddr)
+	if err != nil {
+		return err
+	}
+
+	proxy = p
+
+	go proxy.Start()
+
+	return nil
+}
+
+func StopProxy() (err error) {
+	if proxy == nil {
+		return nil
+	}
+	return proxy.Stop()
 }
 
 func StopServer() error {

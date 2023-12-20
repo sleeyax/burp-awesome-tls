@@ -5,15 +5,15 @@ package burp;
  * Represents the configuration for a transport.
  */
 public class TransportConfig {
-    /*
-    * Hostname.
-     */
-    public String Host;
 
     /**
-     * Protocol scheme (HTTP or HTTPS).
+     * Intercept ClientHello Proxy Address.
      */
-    public String Scheme;
+    public String InterceptProxyAddr;
+    /**
+     * Burp Proxy Address.
+     */
+    public String BurpAddr;
 
     /**
      * The TLS fingerprint to use.

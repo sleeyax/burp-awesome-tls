@@ -1,8 +1,10 @@
 package server
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +12,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"syscall"
 
 	http "github.com/ooni/oohttp"
 	"github.com/open-ch/ja3"
@@ -23,6 +26,8 @@ type interceptProxy struct {
 	mutex           sync.RWMutex
 	clientHelloData map[string]string
 	listener        net.Listener
+	ctx             context.Context
+	cancel          context.CancelFunc
 }
 
 func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) {
@@ -40,7 +45,9 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 		return nil, err
 	}
 
-	proxy := interceptProxy{
+	ctx, cancel := context.WithCancel(context.Background())
+
+	return &interceptProxy{
 		burpClient: &http.Client{
 			Transport: tr,
 		},
@@ -48,11 +55,9 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 		mutex:           sync.RWMutex{},
 		clientHelloData: map[string]string{},
 		listener:        l,
-	}
-
-	go proxy.start()
-
-	return &proxy, nil
+		ctx:             ctx,
+		cancel:          cancel,
+	}, nil
 }
 
 func (s *interceptProxy) getTLSFingerprint(sni string) string {
@@ -62,15 +67,26 @@ func (s *interceptProxy) getTLSFingerprint(sni string) string {
 	return s.clientHelloData[sni]
 }
 
-func (s *interceptProxy) start() {
+func (s *interceptProxy) Start() {
 	for {
-		conn, err := s.listener.Accept()
-		if err != nil {
-			log.Println(err)
-		}
+		select {
+		case <-s.ctx.Done():
+			return
+		default:
+			conn, err := s.listener.Accept()
+			if err != nil {
+				log.Println(err)
+				continue
+			}
 
-		go s.handleConn(conn)
+			go s.handleConn(conn)
+		}
 	}
+}
+
+func (s *interceptProxy) Stop() error {
+	s.cancel()
+	return s.listener.Close()
 }
 
 func (s *interceptProxy) handleConn(in net.Conn) {
@@ -100,7 +116,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 		for {
 			if readClientHello {
-				if _, err := io.ReadAll(inReader); err != nil && err != io.EOF {
+				_, err = io.ReadAll(inReader)
+				if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
 					s.writeError(err)
 				}
 
@@ -165,7 +182,8 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	go func() {
 		defer wg.Done()
 
-		if _, err := io.ReadAll(outReader); err != nil && err != io.EOF {
+		_, err = io.ReadAll(outReader)
+		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
 			s.writeError(err)
 		}
 
@@ -176,6 +194,10 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 }
 
 func (s *interceptProxy) writeError(err error) {
+	if errors.Is(err, io.EOF) {
+		return
+	}
+
 	log.Println(err)
 
 	reqErr := strings.NewReader(fmt.Sprintf("Awesome TLS intercept proxy error: %s", err.Error()))

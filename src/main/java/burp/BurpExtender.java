@@ -33,13 +33,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         callbacks.registerHttpListener(this);
         callbacks.registerProxyListener(this);
         callbacks.registerExtensionStateListener(this);
-        callbacks.addSuiteTab(new SettingsTab(this.settings));
+        callbacks.addSuiteTab(new SettingsTab(this.settings, callbacks));
 
         new Thread(() -> {
-            var err = ServerLibrary.INSTANCE.StartServer(
-                this.settings.getInterceptProxyAddress(),
-                this.settings.getBurpProxyAddress(),
-                this.settings.getSpoofProxyAddress());
+            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getSpoofProxyAddress());
 
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
@@ -57,18 +54,10 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var httpService = messageInfo.getHttpService();
         var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
-        var transportConfig = new TransportConfig();
+        var transportConfig = new RequestConfig();
         transportConfig.Host = httpService.getHost();
         transportConfig.Scheme = httpService.getProtocol();
-        transportConfig.Fingerprint = this.settings.getFingerprint();
-        transportConfig.HexClientHello = this.settings.getHexClientHello();
-        transportConfig.HttpTimeout = this.settings.getHttpTimeout();
-        transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
-        transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
-        transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
-        transportConfig.UseInterceptedFingerprint = this.settings.getUseInterceptedFingerprint();
         var goConfigJSON = this.gson.toJson(transportConfig);
-        this.stdout.println("Using config: " + goConfigJSON);
 
         var headers = req.getHeaders();
         headers.add(HEADER_KEY + ": " + goConfigJSON);

@@ -22,12 +22,19 @@ const (
 	DefaultTLSHandshakeTimeout = time.Duration(10) * time.Second
 )
 
-type TransportConfig struct {
-	// Hostname to send the HTTP request to.
-	Host string
+var DefaultConfig TransportConfig
 
-	// HTTP or HTTPs.
+type RequestConfig struct {
+	Host   string
 	Scheme string
+}
+
+type TransportConfig struct {
+	// InterceptProxyAddr to intercept client tls fingerprint
+	InterceptProxyAddr string
+
+	// BurpAddr
+	BurpAddr string
 
 	// The TLS fingerprint to use.
 	Fingerprint internalTls.Fingerprint
@@ -69,12 +76,28 @@ func ParseTransportConfig(data string) (*TransportConfig, error) {
 	return config, nil
 }
 
+func ParseRequestConfig(data string) (*RequestConfig, error) {
+	config := &RequestConfig{}
+
+	if strings.TrimSpace(data) == "" {
+		return nil, errors.New("missing request configuration")
+	}
+
+	if err := json.Unmarshal([]byte(data), config); err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
 // NewTransport creates a new transport using the given configuration.
-func NewTransport(config *TransportConfig, getInterceptedFingerprint func(sni string) string) (*oohttp.StdlibTransport, error) {
+func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.StdlibTransport, error) {
 	dialer := &net.Dialer{
 		Timeout:   DefaultHttpTimeout,
 		KeepAlive: DefaultHttpKeepAlive,
 	}
+
+	config := DefaultConfig
 
 	if config.HttpTimeout != 0 {
 		dialer.Timeout = time.Duration(config.HttpTimeout) * time.Second

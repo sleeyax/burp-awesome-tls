@@ -1,5 +1,7 @@
 package burp;
 
+import java.io.PrintWriter;
+
 public class Settings {
     private final IBurpExtenderCallbacks callbacks;
 

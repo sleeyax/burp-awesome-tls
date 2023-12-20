@@ -1,5 +1,6 @@
 package burp;
 
+import com.google.gson.Gson;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
@@ -8,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintWriter;
 
 public class SettingsTab implements ITab {
     private JComboBox comboBoxFingerprint;
@@ -36,6 +38,10 @@ public class SettingsTab implements ITab {
     private JPanel panelAdvanced;
     private JButton buttonSaveAdvanced;
 
+    private Gson gson;
+    private PrintWriter stdout;
+    private PrintWriter stderr;
+
     @Override
     public String getTabCaption() {
         return "Awesome TLS";
@@ -46,7 +52,11 @@ public class SettingsTab implements ITab {
         return panelMain;
     }
 
-    public SettingsTab(Settings settings) {
+    public SettingsTab(Settings settings, IBurpExtenderCallbacks callbacks) {
+        gson = new Gson();
+        this.stdout = new PrintWriter(callbacks.getStdout(), true);
+        this.stderr = new PrintWriter(callbacks.getStderr(), true);
+
         textFieldInterceptProxyAddress.setText(settings.getInterceptProxyAddress());
         textFieldBurpProxyAddress.setText(settings.getBurpProxyAddress());
         textFieldSpoofProxyAddress.setText(settings.getSpoofProxyAddress());
@@ -65,19 +75,31 @@ public class SettingsTab implements ITab {
         buttonSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SaveSettings(settings);
+                var err = SaveSettings(settings);
+                if (!err.equals("")) {
+                    JOptionPane.showMessageDialog(panelSettings,
+                            err,
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         buttonSaveAdvanced.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SaveSettings(settings);
+                var err = SaveSettings(settings);
+                if (!err.equals("")) {
+                    JOptionPane.showMessageDialog(panelAdvanced,
+                            err,
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }
 
-    private void SaveSettings(Settings settings) {
+    private String SaveSettings(Settings settings) {
         settings.setSpoofProxyAddress(textFieldSpoofProxyAddress.getText());
         settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
         settings.setHexClientHello(textFieldHexClientHello.getText());
@@ -88,6 +110,22 @@ public class SettingsTab implements ITab {
         settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
         settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
         settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
+
+        var transportConfig = new TransportConfig();
+        transportConfig.InterceptProxyAddr = settings.getInterceptProxyAddress();
+        transportConfig.BurpAddr = settings.getBurpProxyAddress();
+        transportConfig.Fingerprint = settings.getFingerprint();
+        transportConfig.HexClientHello = settings.getHexClientHello();
+        transportConfig.HttpTimeout = settings.getHttpTimeout();
+        transportConfig.HttpKeepAliveInterval = settings.getHttpKeepAliveInterval();
+        transportConfig.IdleConnTimeout = settings.getIdleConnTimeout();
+        transportConfig.TlsHandshakeTimeout = settings.getTlsHandshakeTimeout();
+        transportConfig.UseInterceptedFingerprint = settings.getUseInterceptedFingerprint();
+        var goConfigJSON = this.gson.toJson(transportConfig);
+
+        this.stdout.println("Using config: " + goConfigJSON);
+
+        return ServerLibrary.INSTANCE.SaveSettings(goConfigJSON);
     }
 
     {
