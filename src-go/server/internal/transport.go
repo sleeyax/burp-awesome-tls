@@ -121,9 +121,13 @@ func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.St
 	}
 
 	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
+		if !config.UseInterceptedFingerprint {
+			return clientHelloID, spec
+		}
+
 		interceptedFingerprint := getInterceptedFingerprint(sni)
 
-		if !config.UseInterceptedFingerprint || interceptedFingerprint == "" {
+		if interceptedFingerprint == "" {
 			return clientHelloID, spec
 		}
 
