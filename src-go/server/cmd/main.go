@@ -10,8 +10,6 @@ import (
 	"server"
 )
 
-var isProxyOn bool
-
 func main() {
 	interceptAddr := flag.String("intercept", server.DefaultInterceptProxyAddress, "Intercept proxy address to listen on ([ip:]port)")
 	burpAddr := flag.String("burp", server.DefaultBurpProxyAddress, "Burp proxy address to listen on ([ip:]port)")

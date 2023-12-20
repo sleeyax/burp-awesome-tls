@@ -186,8 +186,6 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
 			s.writeError(err)
 		}
-
-		return
 	}()
 
 	wg.Wait()
