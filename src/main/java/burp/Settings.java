@@ -124,10 +124,6 @@ public class Settings {
         this.write(this.fingerprint, fingerprint);
     }
 
-    public String getHexClientHello() { return this.read(this.hexClientHello); }
-
-    public void setHexClientHello(String hexClientHello) { this.write(this.hexClientHello, hexClientHello); }
-
     public int getIdleConnTimeout() {
         return Integer.parseInt(this.read(this.idleConnTimeout));
     }
