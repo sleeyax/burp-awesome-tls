@@ -36,17 +36,18 @@ This magic header is stripped from the request before it's forwarded to the dest
 ## Configuration
 This extension is 'plug and play' and should speak for itself. You can hover with your mouse over each field in the 'Awesome TLS' tab for more information about each field.
 
-To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
-![screenshot](./docs/wireshark_capture_client_hello.png)
-
-You can also use additional settings to enable a proxy that will automatically get a fingerprint from the request and use it. Thus, the intercept proxy will be raised, which you will have to use on the client.
+<details>
+  <summary>Advanced usage</summary>
+  
+In the 'advanced' tab, you can enable an additional proxy listener that will automatically apply the current fingerprint from the request:
 
 ![screenshot](./docs/advanced_settings.png)
 
-After that, the overall structure will look like this:
+When enabled, the diagram changes to this:
 
 ![diagram](./docs/advanced_diagram.png)
 
+</details>
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
 The build instructions below assume you're using the same tools to build.
