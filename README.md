@@ -48,6 +48,7 @@ When enabled, the diagram changes to this:
 ![diagram](./docs/advanced_diagram.png)
 
 </details>
+
 ## Manual build Instructions
 This extension was developed with JetBrains IntelliJ (and GoLand) IDE. 
 The build instructions below assume you're using the same tools to build.
