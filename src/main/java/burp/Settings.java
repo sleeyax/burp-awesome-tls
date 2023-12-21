@@ -9,7 +9,6 @@ public class Settings {
     private final String interceptProxyAddress = "InterceptProxyAddress";
     private final String burpProxyAddress = "BurpProxyAddress";
     private final String fingerprint = "Fingerprint";
-    private final String hexClientHello = "HexClientHello";
     private final String useInterceptedFingerprint = "UseInterceptedFingerprint";
     private final String httpTimeout = "HttpTimeout";
     private final String httpKeepAliveInterval = "HttpKeepAliveInterval";

@@ -3,7 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -38,9 +37,6 @@ type TransportConfig struct {
 
 	// The TLS fingerprint to use.
 	Fingerprint internalTls.Fingerprint
-
-	// Hexadecimal Client Hello to use
-	HexClientHello internalTls.HexClientHello
 
 	// The maximum amount of time a dial will wait for a connect to complete.
 	// Defaults to [DefaultHttpTimeout].
@@ -106,23 +102,12 @@ func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.St
 		dialer.KeepAlive = time.Duration(config.HttpKeepAliveInterval) * time.Second
 	}
 
-	var err error
 	var spec *utls.ClientHelloSpec
 	var clientHelloID *utls.ClientHelloID
 
-	if config.HexClientHello != "" {
-		spec, err = config.HexClientHello.ToClientHelloSpec()
-		if err != nil {
-			return nil, fmt.Errorf("create spec from client hello: %w", err)
-		}
-		clientHelloID = &utls.HelloCustom
-	} else {
-		clientHelloID = config.Fingerprint.ToClientHelloId()
-	}
-
 	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
 		if !config.UseInterceptedFingerprint {
-			return clientHelloID, spec
+			return config.Fingerprint.ToClientHelloId(), spec
 		}
 
 		interceptedFingerprint := getInterceptedFingerprint(sni)
@@ -131,9 +116,9 @@ func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.St
 			return clientHelloID, spec
 		}
 
-		interseptedSpec, err := internalTls.HexClientHello(interceptedFingerprint).ToClientHelloSpec()
+		interceptedSpec, err := internalTls.HexClientHello(interceptedFingerprint).ToClientHelloSpec()
 		if err == nil {
-			return &utls.HelloCustom, interseptedSpec
+			return &utls.HelloCustom, interceptedSpec
 		}
 
 		return clientHelloID, spec

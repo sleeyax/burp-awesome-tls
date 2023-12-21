@@ -28,8 +28,6 @@ public class SettingsTab implements ITab {
     private JSpinner spinnerIdleConnTimeout;
     private JLabel labelTlsHandshakeTimeout;
     private JSpinner spinnerTlsHandshakeTimeout;
-    private JLabel labelHexClientHello;
-    private JTextField textFieldHexClientHello;
     private JLabel labelInterceptProxyAddress;
     private JLabel labelBurpProxyAddress;
     private JRadioButton radioButtonUseInterceptedFingerprint;
