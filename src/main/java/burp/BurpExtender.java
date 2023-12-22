@@ -37,12 +37,25 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
         new Thread(() -> {
             var err = ServerLibrary.INSTANCE.StartServer(this.settings.getSpoofProxyAddress());
-
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;
                 out.println(err);
                 if (!isGraceful) callbacks.unloadExtension(); // fatal error; disable the extension
+            }
+
+            var transportConfig = new TransportConfig();
+            transportConfig.Fingerprint = this.settings.getFingerprint();
+            transportConfig.HttpTimeout = this.settings.getHttpTimeout();
+            transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
+            transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
+            transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
+            transportConfig.UseInterceptedFingerprint = this.settings.getUseInterceptedFingerprint();
+            var goConfigJSON = this.gson.toJson(transportConfig);
+
+            err = ServerLibrary.INSTANCE.SaveSettings(goConfigJSON);
+            if (!err.equals("")) {
+                this.stdout.println(err);
             }
         }).start();
     }

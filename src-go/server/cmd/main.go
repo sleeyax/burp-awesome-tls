@@ -11,12 +11,11 @@ import (
 )
 
 func main() {
-	interceptAddr := flag.String("intercept", server.DefaultInterceptProxyAddress, "Intercept proxy address to listen on ([ip:]port)")
-	burpAddr := flag.String("burp", server.DefaultBurpProxyAddress, "Burp proxy address to listen on ([ip:]port)")
 	spoofAddr := flag.String("spoof", server.DefaultSpoofProxyAddress, "Spoof proxy address to listen on ([ip:]port)")
 	flag.Parse()
 
-	if err := server.StartProxy(*interceptAddr, *burpAddr); err != nil {
+	settings := `{"InterceptProxyAddr":":8886","BurpAddr":"127.0.0.1:8080","Fingerprint":"Firefox 105","UseInterceptedFingerprint":true,"HttpTimeout":30,"HttpKeepAliveInterval":30,"IdleConnTimeout":90,"TlsHandshakeTimeout":10}`
+	if err := server.SaveSettings(settings); err != nil {
 		log.Fatalln(err)
 	}
 
