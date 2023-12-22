@@ -103,11 +103,11 @@ func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.St
 	}
 
 	var spec *utls.ClientHelloSpec
-	var clientHelloID *utls.ClientHelloID
+	clientHelloID := config.Fingerprint.ToClientHelloId()
 
 	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
 		if !config.UseInterceptedFingerprint {
-			return config.Fingerprint.ToClientHelloId(), spec
+			return clientHelloID, spec
 		}
 
 		interceptedFingerprint := getInterceptedFingerprint(sni)
