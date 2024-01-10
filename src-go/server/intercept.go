@@ -171,11 +171,12 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 			if err != nil {
 				s.writeError(err)
 				return
-			} else {
-				s.mutex.Lock()
-				s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
-				s.mutex.Unlock()
 			}
+			
+			s.mutex.Lock()
+			s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
+			s.mutex.Unlock()
+			
 		}
 	}()
 
