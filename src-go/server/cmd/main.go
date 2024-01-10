@@ -3,9 +3,13 @@ package main
 import "C"
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+
+	"server/internal"
+	"server/internal/tls"
 
 	"server"
 )
@@ -14,8 +18,21 @@ func main() {
 	spoofAddr := flag.String("spoof", server.DefaultSpoofProxyAddress, "Spoof proxy address to listen on ([ip:]port)")
 	flag.Parse()
 
-	settings := `{"InterceptProxyAddr":":8886","BurpAddr":"127.0.0.1:8080","Fingerprint":"Firefox 105","UseInterceptedFingerprint":true,"HttpTimeout":30,"HttpKeepAliveInterval":30,"IdleConnTimeout":90,"TlsHandshakeTimeout":10}`
-	if err := server.SaveSettings(settings); err != nil {
+	defaultConfig, err := json.Marshal(internal.TransportConfig{
+		InterceptProxyAddr:        server.DefaultInterceptProxyAddress,
+		BurpAddr:                  server.DefaultBurpProxyAddress,
+		Fingerprint:               tls.DefaultFingerprint,
+		UseInterceptedFingerprint: false,
+		HttpTimeout:               int(internal.DefaultHttpTimeout.Seconds()),
+		HttpKeepAliveInterval:     int(internal.DefaultHttpKeepAlive.Seconds()),
+		IdleConnTimeout:           int(internal.DefaultIdleConnTimeout.Seconds()),
+		TLSHandshakeTimeout:       int(internal.DefaultTLSHandshakeTimeout.Seconds()),
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := server.SaveSettings(string(defaultConfig)); err != nil {
 		log.Fatalln(err)
 	}
 
