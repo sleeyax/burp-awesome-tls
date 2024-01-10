@@ -1,5 +1,4 @@
-/.idea/
-/src/main/java/burp/.idea
+.idea
 /.gradle/
 /build/
 *.h
