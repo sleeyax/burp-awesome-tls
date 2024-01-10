@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	http "github.com/ooni/oohttp"
 	"github.com/open-ch/ja3"
@@ -74,9 +75,14 @@ func (s *interceptProxy) Start() {
 			return
 		default:
 			conn, err := s.listener.Accept()
-			if err != nil {
+			var netErr net.Error
+			if errors.As(err, &netErr) && netErr.Timeout() {
 				log.Println(err)
+				time.Sleep(time.Second)
 				continue
+			} else if err != nil {
+				log.Println(err)
+				return
 			}
 
 			go s.handleConn(conn)
