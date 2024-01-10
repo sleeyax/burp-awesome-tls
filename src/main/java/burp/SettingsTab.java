@@ -30,7 +30,7 @@ public class SettingsTab implements ITab {
     private JSpinner spinnerTlsHandshakeTimeout;
     private JLabel labelInterceptProxyAddress;
     private JLabel labelBurpProxyAddress;
-    private JRadioButton radioButtonUseInterceptedFingerprint;
+    private JCheckBox checkBoxButtonUseInterceptedFingerprint;
     private JTabbedPane tabbedPaneTab;
     private JPanel panelSettings;
     private JPanel panelAdvanced;
@@ -105,7 +105,7 @@ public class SettingsTab implements ITab {
         settings.setTlsHandshakeTimeout((int) spinnerTlsHandshakeTimeout.getValue());
         settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
         settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
-        settings.setUseInterceptedFingerprint(radioButtonUseInterceptedFingerprint.isSelected());
+        settings.setUseInterceptedFingerprint(checkBoxButtonUseInterceptedFingerprint.isSelected());
 
         var transportConfig = new TransportConfig();
         transportConfig.InterceptProxyAddr = settings.getInterceptProxyAddress();
@@ -209,9 +209,6 @@ public class SettingsTab implements ITab {
         textFieldBurpProxyAddress = new JTextField();
         textFieldBurpProxyAddress.setText("");
         panelAdvanced.add(textFieldBurpProxyAddress, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        radioButtonUseInterceptedFingerprint = new JRadioButton();
-        radioButtonUseInterceptedFingerprint.setText("Use intercepted tls fingerprint");
-        panelAdvanced.add(radioButtonUseInterceptedFingerprint, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         buttonSaveAdvanced = new JButton();
         buttonSaveAdvanced.setHideActionText(false);
         buttonSaveAdvanced.setText("Save all settings");
@@ -221,6 +218,9 @@ public class SettingsTab implements ITab {
         panelAdvanced.add(panel2, new com.intellij.uiDesigner.core.GridConstraints(6, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
         panel2.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        checkBoxButtonUseInterceptedFingerprint = new JCheckBox();
+        checkBoxButtonUseInterceptedFingerprint.setText("Use intercepted tls fingerprint");
+        panelAdvanced.add(checkBoxButtonUseInterceptedFingerprint, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

@@ -38,6 +38,8 @@ func init() {
 }
 
 func StartServer(addr string) error {
+	s = &http.Server{}
+
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
 		return fmt.Errorf("NewCertificateAuthority, err: %w", err)

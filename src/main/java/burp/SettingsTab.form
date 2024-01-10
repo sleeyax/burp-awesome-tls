@@ -191,14 +191,6 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="4d012" class="javax.swing.JRadioButton" binding="radioButtonUseInterceptedFingerprint">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Use intercepted tls fingerprint"/>
-                </properties>
-              </component>
               <component id="b3c00" class="javax.swing.JButton" binding="buttonSaveAdvanced">
                 <constraints>
                   <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -223,6 +215,14 @@
                   </vspacer>
                 </children>
               </grid>
+              <component id="cdd5e" class="javax.swing.JCheckBox" binding="checkBoxButtonUseInterceptedFingerprint">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Use intercepted tls fingerprint"/>
+                </properties>
+              </component>
             </children>
           </grid>
         </children>
