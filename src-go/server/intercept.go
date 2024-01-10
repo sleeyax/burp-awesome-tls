@@ -172,18 +172,10 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 				s.writeError(err)
 				return
 			}
-<<<<<<< Updated upstream
-			
-			s.mutex.Lock()
-			s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
-			s.mutex.Unlock()
-			
-=======
 
 			s.mutex.Lock()
 			s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
 			s.mutex.Unlock()
->>>>>>> Stashed changes
 		}
 	}()
 
