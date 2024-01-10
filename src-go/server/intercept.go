@@ -76,7 +76,7 @@ func (s *interceptProxy) Start() {
 			conn, err := s.listener.Accept()
 			if err != nil {
 				log.Println(err)
-				return
+				continue
 			}
 
 			go s.handleConn(conn)
