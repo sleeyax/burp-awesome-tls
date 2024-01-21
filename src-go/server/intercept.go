@@ -19,7 +19,11 @@ import (
 	"github.com/open-ch/ja3"
 )
 
-const tlsClientHelloMsgType = "16"
+const (
+	tlsClientHelloMsgType = "16"
+
+	maxConnErrors = 5
+)
 
 type interceptProxy struct {
 	burpClient      *http.Client
@@ -69,14 +73,21 @@ func (s *interceptProxy) getTLSFingerprint(sni string) string {
 }
 
 func (s *interceptProxy) Start() {
+	var errCounter int
+
 	for {
 		select {
 		case <-s.ctx.Done():
 			return
 		default:
+			if errCounter > maxConnErrors {
+				return
+			}
+
 			conn, err := s.listener.Accept()
 			var netErr net.Error
 			if errors.As(err, &netErr) && netErr.Timeout() {
+				errCounter++
 				log.Println(err)
 				time.Sleep(time.Second)
 				continue
@@ -84,6 +95,8 @@ func (s *interceptProxy) Start() {
 				log.Println(err)
 				return
 			}
+
+			errCounter = 0
 
 			go s.handleConn(conn)
 		}
@@ -105,7 +118,7 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	}
 
 	defer out.Close()
-	
+
 	inReader := io.TeeReader(in, out)
 	outReader := io.TeeReader(out, in)
 
@@ -113,37 +126,28 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 	wg.Add(2)
 
-	go s.readClientHello(&wg, inReader)
-
-        // TODO: refactor me in a similar way!
 	go func() {
 		defer wg.Done()
+		s.readClientHello(inReader)
+	}()
 
-		_, err = io.ReadAll(outReader)
-		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
-			s.writeError(err)
-		}
+	go func() {
+		defer wg.Done()
+		s.readAll(outReader)
 	}()
 
 	wg.Wait()
 }
 
-
-func (s *interceptProxy) readClientHello(wg *sync.WaitGroup, inReader io.Reader) {
-	defer wg.Done()
-	
+func (s *interceptProxy) readClientHello(inReader io.Reader) {
 	var readClientHello bool
 	var length uint16
 	var clientHello []byte
 	var err error
-	
+
 	for {
 		if readClientHello {
-			_, err = io.ReadAll(inReader)
-			if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
-				s.writeError(err)
-			}
-
+			s.readAll(inReader)
 			return
 		}
 
@@ -201,6 +205,14 @@ func (s *interceptProxy) readClientHello(wg *sync.WaitGroup, inReader io.Reader)
 		s.mutex.Unlock()
 	}
 }
+
+func (s *interceptProxy) readAll(reader io.Reader) {
+	_, err := io.ReadAll(reader)
+	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
+		s.writeError(err)
+	}
+}
+
 func (s *interceptProxy) writeError(err error) {
 	if errors.Is(err, io.EOF) {
 		return
