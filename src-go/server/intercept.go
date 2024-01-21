@@ -105,11 +105,7 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	}
 
 	defer out.Close()
-
-	var readClientHello bool
-	var length uint16
-	var clientHello []byte
-
+	
 	inReader := io.TeeReader(in, out)
 	outReader := io.TeeReader(out, in)
 
@@ -117,74 +113,9 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 
 	wg.Add(2)
 
-	go func() {
-		defer wg.Done()
+	go s.readClientHello(&wg, inReader)
 
-		for {
-			if readClientHello {
-				_, err = io.ReadAll(inReader)
-				if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
-					s.writeError(err)
-				}
-
-				return
-			}
-
-			buf := make([]byte, 1)
-			if _, err = inReader.Read(buf); err != nil {
-				s.writeError(err)
-				return
-			}
-
-			// catch ClientHello message type
-			if hex.EncodeToString(buf) != tlsClientHelloMsgType {
-				continue
-			}
-
-			clientHello = append(clientHello, buf...)
-
-			// read tls version
-			buf = make([]byte, 2)
-			if _, err = inReader.Read(buf); err != nil {
-				s.writeError(err)
-				return
-			}
-
-			clientHello = append(clientHello, buf...)
-
-			// read client hello length
-			buf = make([]byte, 2)
-			if _, err = inReader.Read(buf); err != nil {
-				s.writeError(err)
-				return
-			}
-
-			length = binary.BigEndian.Uint16(buf)
-			clientHello = append(clientHello, buf...)
-
-			// read remaining client hello by length
-			buf = make([]byte, length)
-			if _, err = inReader.Read(buf); err != nil {
-				s.writeError(err)
-				return
-			}
-
-			clientHello = append(clientHello, buf...)
-
-			readClientHello = true
-
-			j, err := ja3.ComputeJA3FromSegment(clientHello)
-			if err != nil {
-				s.writeError(err)
-				return
-			}
-
-			s.mutex.Lock()
-			s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
-			s.mutex.Unlock()
-		}
-	}()
-
+        // TODO: refactor me in a similar way!
 	go func() {
 		defer wg.Done()
 
@@ -197,6 +128,79 @@ func (s *interceptProxy) handleConn(in net.Conn) {
 	wg.Wait()
 }
 
+
+func (s *interceptProxy) readClientHello(wg *sync.WaitGroup, inReader io.Reader) {
+	defer wg.Done()
+	
+	var readClientHello bool
+	var length uint16
+	var clientHello []byte
+	var err error
+	
+	for {
+		if readClientHello {
+			_, err = io.ReadAll(inReader)
+			if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, syscall.ECONNRESET) && !errors.Is(err, syscall.EPIPE) {
+				s.writeError(err)
+			}
+
+			return
+		}
+
+		buf := make([]byte, 1)
+		if _, err = inReader.Read(buf); err != nil {
+			s.writeError(err)
+			return
+		}
+
+		// catch ClientHello message type
+		if hex.EncodeToString(buf) != tlsClientHelloMsgType {
+			continue
+		}
+
+		clientHello = append(clientHello, buf...)
+
+		// read tls version
+		buf = make([]byte, 2)
+		if _, err = inReader.Read(buf); err != nil {
+			s.writeError(err)
+			return
+		}
+
+		clientHello = append(clientHello, buf...)
+
+		// read client hello length
+		buf = make([]byte, 2)
+		if _, err = inReader.Read(buf); err != nil {
+			s.writeError(err)
+			return
+		}
+
+		length = binary.BigEndian.Uint16(buf)
+		clientHello = append(clientHello, buf...)
+
+		// read remaining client hello by length
+		buf = make([]byte, length)
+		if _, err = inReader.Read(buf); err != nil {
+			s.writeError(err)
+			return
+		}
+
+		clientHello = append(clientHello, buf...)
+
+		readClientHello = true
+
+		j, err := ja3.ComputeJA3FromSegment(clientHello)
+		if err != nil {
+			s.writeError(err)
+			return
+		}
+
+		s.mutex.Lock()
+		s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
+		s.mutex.Unlock()
+	}
+}
 func (s *interceptProxy) writeError(err error) {
 	if errors.Is(err, io.EOF) {
 		return
