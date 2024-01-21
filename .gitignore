@@ -1,7 +1,8 @@
-/.idea/
+.idea
 /.gradle/
 /build/
 *.h
 *.so
 *.dll
 *.dylib
+.DS_Store

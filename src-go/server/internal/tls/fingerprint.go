@@ -6,11 +6,13 @@ import (
 	utls "github.com/refraction-networking/utls"
 )
 
+const DefaultFingerprint = "Default"
+
 type Fingerprint string
 
 func (fingerprint Fingerprint) ToClientHelloId() *utls.ClientHelloID {
-	if fingerprint == "Default" {
-		return nil
+	if fingerprint == DefaultFingerprint {
+		return DefaultClientHelloID
 	}
 
 	parts := strings.Split(string(fingerprint), " ")

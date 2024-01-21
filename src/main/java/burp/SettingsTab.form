@@ -1,146 +1,232 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="burp.SettingsTab">
-  <grid id="27dc6" binding="panelMain" layout-manager="GridLayoutManager" row-count="17" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="panelMain" layout-manager="GridLayoutManager" row-count="3" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="964" height="650"/>
+      <xy x="20" y="20" width="964" height="824"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <vspacer id="6cc77">
+      <tabbedpane id="43b9a" binding="tabbedPaneTab">
         <constraints>
-          <grid row="16" column="2" row-span="1" col-span="2" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </vspacer>
-      <component id="70a26" class="javax.swing.JLabel" binding="labelAddress">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <requestFocusEnabled value="false"/>
-          <text value="Listener address:"/>
-          <toolTipText value=""/>
-        </properties>
-      </component>
-      <component id="e56d6" class="javax.swing.JTextField" binding="textFieldAddress">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="200"/>
           </grid>
-        </constraints>
-        <properties>
-          <toolTipText value="Local address the HTTPS server should listen on. Requires extension reload."/>
-        </properties>
-      </component>
-      <component id="bed5e" class="javax.swing.JLabel" binding="labelTimeout">
-        <constraints>
-          <grid row="7" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Http connection timeout (seconds)"/>
-        </properties>
-      </component>
-      <component id="5078b" class="javax.swing.JSpinner" binding="spinnerHttpTimout">
-        <constraints>
-          <grid row="8" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <toolTipText value="The maximum amount of time a dial will wait for a connect to complete."/>
-        </properties>
-      </component>
-      <component id="e91b6" class="javax.swing.JLabel" binding="labelKeepAlive">
-        <constraints>
-          <grid row="9" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Http keep alive interval"/>
-        </properties>
-      </component>
-      <component id="b51c9" class="javax.swing.JLabel" binding="labelFingerprint">
-        <constraints>
-          <grid row="2" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <enabled value="true"/>
-          <horizontalAlignment value="10"/>
-          <text value="Fingerprint:"/>
-          <verticalAlignment value="0"/>
-          <verticalTextPosition value="0"/>
-        </properties>
-      </component>
-      <component id="b6939" class="javax.swing.JComboBox" binding="comboBoxFingerprint">
-        <constraints>
-          <grid row="3" column="0" row-span="2" col-span="7" vsize-policy="0" hsize-policy="2" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
-      </component>
-      <component id="bd213" class="javax.swing.JSpinner" binding="spinnerKeepAlive">
-        <constraints>
-          <grid row="10" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <toolTipText value="Specifies the interval between keep-alive probes for an active network connection."/>
-        </properties>
-      </component>
-      <component id="a2f49" class="javax.swing.JLabel" binding="labelIdleConnTimeout">
-        <constraints>
-          <grid row="11" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Idle connection timeout"/>
-        </properties>
-      </component>
-      <component id="5efb6" class="javax.swing.JSpinner" binding="spinnerIdleConnTimeout">
-        <constraints>
-          <grid row="12" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <toolTipText value="The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself."/>
-        </properties>
-      </component>
-      <component id="e4f58" class="javax.swing.JLabel" binding="labelTlsHandshakeTimeout">
-        <constraints>
-          <grid row="13" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="TLS handshake timeout"/>
-        </properties>
-      </component>
-      <component id="2b2e5" class="javax.swing.JSpinner" binding="spinnerTlsHandshakeTimeout">
-        <constraints>
-          <grid row="14" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <toolTipText value="The maximum amount of time to wait for a TLS handshake."/>
-        </properties>
-      </component>
-      <component id="da183" class="javax.swing.JButton" binding="buttonSave">
-        <constraints>
-          <grid row="15" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Save all settings"/>
-        </properties>
-      </component>
-      <component id="a5fce" class="javax.swing.JLabel" binding="labelHexClientHello">
-        <constraints>
-          <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Hex Client Hello"/>
-        </properties>
-      </component>
-      <component id="56d1e" class="javax.swing.JTextField" binding="textFieldHexClientHello">
-        <constraints>
-          <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
+        <border type="none"/>
+        <children>
+          <grid id="65d0" binding="panelSettings" layout-manager="GridLayoutManager" row-count="14" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <tabbedpane title="settings"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="70a26" class="javax.swing.JLabel" binding="labelSpoofProxyAddress">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <requestFocusEnabled value="false"/>
+                  <text value="Listen address:"/>
+                  <toolTipText value=""/>
+                </properties>
+              </component>
+              <component id="e56d6" class="javax.swing.JTextField" binding="textFieldSpoofProxyAddress">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <toolTipText value="Local address the  proxy server should listen on. Requires extension reload."/>
+                </properties>
+              </component>
+              <component id="b51c9" class="javax.swing.JLabel" binding="labelFingerprint">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <horizontalAlignment value="10"/>
+                  <text value="Fingerprint:"/>
+                  <verticalAlignment value="0"/>
+                  <verticalTextPosition value="0"/>
+                </properties>
+              </component>
+              <component id="b6939" class="javax.swing.JComboBox" binding="comboBoxFingerprint">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="a5fce" class="javax.swing.JLabel" binding="labelTimeout">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Http connection timeout (seconds)"/>
+                </properties>
+              </component>
+              <component id="5078b" class="javax.swing.JSpinner" binding="spinnerHttpTimout">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <toolTipText value="The maximum amount of time a dial will wait for a connect to complete."/>
+                </properties>
+              </component>
+              <component id="e91b6" class="javax.swing.JLabel" binding="labelKeepAlive">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Http keep alive interval"/>
+                </properties>
+              </component>
+              <component id="bd213" class="javax.swing.JSpinner" binding="spinnerKeepAlive">
+                <constraints>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <toolTipText value="Specifies the interval between keep-alive probes for an active network connection."/>
+                </properties>
+              </component>
+              <component id="a2f49" class="javax.swing.JLabel" binding="labelIdleConnTimeout">
+                <constraints>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Idle connection timeout"/>
+                </properties>
+              </component>
+              <component id="5efb6" class="javax.swing.JSpinner" binding="spinnerIdleConnTimeout">
+                <constraints>
+                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <toolTipText value="The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself."/>
+                </properties>
+              </component>
+              <component id="e4f58" class="javax.swing.JLabel" binding="labelTlsHandshakeTimeout">
+                <constraints>
+                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="TLS handshake timeout"/>
+                </properties>
+              </component>
+              <component id="2b2e5" class="javax.swing.JSpinner" binding="spinnerTlsHandshakeTimeout">
+                <constraints>
+                  <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <toolTipText value="The maximum amount of time to wait for a TLS handshake."/>
+                </properties>
+              </component>
+              <component id="da183" class="javax.swing.JButton" binding="buttonSave">
+                <constraints>
+                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Save all settings"/>
+                </properties>
+              </component>
+              <grid id="4bfb5" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+            </children>
           </grid>
-        </constraints>
-        <properties>
-          <toolTipText value="Custom client hello as hex stream."/>
-        </properties>
-      </component>
+          <grid id="9c113" binding="panelAdvanced" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <tabbedpane title="advanced"/>
+            </constraints>
+            <properties>
+              <toolTipText value=""/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="35333" class="javax.swing.JLabel" binding="labelInterceptProxyAddress">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <text value="Intercept proxy address:"/>
+                </properties>
+              </component>
+              <component id="1eb46" class="javax.swing.JTextField" binding="textFieldInterceptProxyAddress">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <toolTipText value="Local address the intercept proxy server should listen on. Use it to configure proxy on your client. Requires extension reload."/>
+                </properties>
+              </component>
+              <component id="2d47c" class="javax.swing.JLabel" binding="labelBurpProxyAddress">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Burp proxy address:"/>
+                </properties>
+              </component>
+              <component id="70622" class="javax.swing.JTextField" binding="textFieldBurpProxyAddress">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="b3c00" class="javax.swing.JButton" binding="buttonSaveAdvanced">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <hideActionText value="false"/>
+                  <text value="Save all settings"/>
+                </properties>
+              </component>
+              <grid id="cce28" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <vspacer id="c952c">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                  </vspacer>
+                </children>
+              </grid>
+              <component id="cdd5e" class="javax.swing.JCheckBox" binding="checkBoxButtonUseInterceptedFingerprint">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Use intercepted tls fingerprint"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </tabbedpane>
     </children>
   </grid>
 </form>

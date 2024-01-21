@@ -1,12 +1,14 @@
 package burp;
 
 import com.google.gson.Gson;
+import com.sun.jna.Native;
 
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener {
+public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionStateListener, IProxyListener {
     private PrintWriter stdout;
     private PrintWriter stderr;
     private Gson gson;
@@ -29,16 +31,31 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
         callbacks.setExtensionName("Awesome TLS");
         callbacks.registerHttpListener(this);
+        callbacks.registerProxyListener(this);
         callbacks.registerExtensionStateListener(this);
-        callbacks.addSuiteTab(new SettingsTab(this.settings));
+        callbacks.addSuiteTab(new SettingsTab(this.settings, callbacks));
 
         new Thread(() -> {
-            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getAddress());
+            var err = ServerLibrary.INSTANCE.StartServer(this.settings.getSpoofProxyAddress());
             if (!err.equals("")) {
                 var isGraceful = err.contains("Server stopped"); // server was stopped gracefully by calling StopServer()
                 var out = isGraceful ? this.stdout : this.stderr;
                 out.println(err);
                 if (!isGraceful) callbacks.unloadExtension(); // fatal error; disable the extension
+            }
+
+            var transportConfig = new TransportConfig();
+            transportConfig.Fingerprint = this.settings.getFingerprint();
+            transportConfig.HttpTimeout = this.settings.getHttpTimeout();
+            transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
+            transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
+            transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
+            transportConfig.UseInterceptedFingerprint = this.settings.getUseInterceptedFingerprint();
+            var goConfigJSON = this.gson.toJson(transportConfig);
+
+            err = ServerLibrary.INSTANCE.SaveSettings(goConfigJSON);
+            if (!err.equals("")) {
+                this.stdout.println(err);
             }
         }).start();
     }
@@ -50,23 +67,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var httpService = messageInfo.getHttpService();
         var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
-        var transportConfig = new TransportConfig();
+        var transportConfig = new RequestConfig();
         transportConfig.Host = httpService.getHost();
         transportConfig.Scheme = httpService.getProtocol();
-        transportConfig.Fingerprint = this.settings.getFingerprint();
-        transportConfig.HexClientHello = this.settings.getHexClientHello();
-        transportConfig.HttpTimeout = this.settings.getHttpTimeout();
-        transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
-        transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
-        transportConfig.TlsHandshakeTimeout = this.settings.getTlsHandshakeTimeout();
         var goConfigJSON = this.gson.toJson(transportConfig);
-        this.stdout.println("Using config: " + goConfigJSON);
 
         var headers = req.getHeaders();
         headers.add(HEADER_KEY + ": " + goConfigJSON);
 
         try {
-            var url = new URL("https://" + this.settings.getAddress());
+            var url = new URL("https://" + this.settings.getSpoofProxyAddress());
             messageInfo.setHttpService(helpers.buildHttpService(url.getHost(), url.getPort(), url.getProtocol()));
             messageInfo.setRequest(helpers.buildHttpMessage(headers, Arrays.copyOfRange(messageInfo.getRequest(), req.getBodyOffset(), messageInfo.getRequest().length)));
         } catch (Exception e) {
@@ -80,6 +90,16 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var err = ServerLibrary.INSTANCE.StopServer();
         if (!err.equals("")) {
             this.stderr.println(err);
+        }
+    }
+
+    @Override
+    public void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message) {
+        if (message.getMessageInfo().getHttpService().getHost().equals("awesome-tls-error")) {
+            var bodyOffset = this.helpers.analyzeRequest(message.getMessageInfo().getRequest()).getBodyOffset();
+            var req = message.getMessageInfo().getRequest();
+            var body = Arrays.copyOfRange(req, bodyOffset, req.length);
+            this.stderr.println(new String(body, StandardCharsets.UTF_8));
         }
     }
 }

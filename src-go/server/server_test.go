@@ -3,7 +3,7 @@ package server
 import "testing"
 
 func TestStartServer(t *testing.T) {
-	if err := StartServer(DefaultAddress); err != nil {
+	if err := StartServer(DefaultSpoofProxyAddress); err != nil {
 		t.Fatal(err)
 	}
 

@@ -22,20 +22,11 @@ type ConnFactory interface {
 type FactoryWithClientHelloId struct {
 	// The TLS client hello id (fingerprint) to use.
 	// Defaults to [DefaultClientHelloID].
-	ClientHelloID   *utls.ClientHelloID
-	ClientHelloSpec *utls.ClientHelloSpec
+	GetClientHello func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec)
 }
 
 // NewUTLSConn implements ConnFactory.
 func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config) oohttp.TLSConn {
-	clientHelloID := f.ClientHelloID
-
-	if f.ClientHelloSpec != nil {
-		clientHelloID = &utls.HelloCustom
-	} else if clientHelloID == nil {
-		clientHelloID = DefaultClientHelloID
-	}
-
 	uConfig := &utls.Config{
 		RootCAs:                     config.RootCAs,
 		NextProtos:                  config.NextProtos,
@@ -44,5 +35,7 @@ func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config
 		InsecureSkipVerify:          true,
 	}
 
-	return &uconnAdapter{UConn: utls.UClient(conn, uConfig, *clientHelloID), spec: f.ClientHelloSpec}
+	clientHelloID, spec := f.GetClientHello(config.ServerName)
+
+	return &uconnAdapter{UConn: utls.UClient(conn, uConfig, *clientHelloID), spec: spec}
 }

@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/ooni/oohttp v0.6.1
+	github.com/open-ch/ja3 v1.0.1
 	github.com/refraction-networking/utls v1.3.2
 )
 

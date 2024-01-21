@@ -3,10 +3,11 @@ package internal
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
 	"strings"
 	"time"
+
+	utls "github.com/refraction-networking/utls"
 
 	internalTls "server/internal/tls"
 
@@ -20,18 +21,22 @@ const (
 	DefaultTLSHandshakeTimeout = time.Duration(10) * time.Second
 )
 
-type TransportConfig struct {
-	// Hostname to send the HTTP request to.
-	Host string
+var DefaultConfig TransportConfig
 
-	// HTTP or HTTPs.
+type RequestConfig struct {
+	Host   string
 	Scheme string
+}
+
+type TransportConfig struct {
+	// InterceptProxyAddr to intercept client tls fingerprint
+	InterceptProxyAddr string
+
+	// BurpAddr
+	BurpAddr string
 
 	// The TLS fingerprint to use.
 	Fingerprint internalTls.Fingerprint
-
-	// Hexadecimal Client Hello to use
-	HexClientHello internalTls.HexClientHello
 
 	// The maximum amount of time a dial will wait for a connect to complete.
 	// Defaults to [DefaultHttpTimeout].
@@ -48,6 +53,9 @@ type TransportConfig struct {
 	// The maximum amount of time to wait for a TLS handshake.
 	// Defaults to [DefaultTLSHandshakeTimeout].
 	TLSHandshakeTimeout int
+
+	// UseInterceptedFingerprint use intercepted fingerprint
+	UseInterceptedFingerprint bool
 }
 
 func ParseTransportConfig(data string) (*TransportConfig, error) {
@@ -64,12 +72,28 @@ func ParseTransportConfig(data string) (*TransportConfig, error) {
 	return config, nil
 }
 
+func ParseRequestConfig(data string) (*RequestConfig, error) {
+	config := &RequestConfig{}
+
+	if strings.TrimSpace(data) == "" {
+		return nil, errors.New("missing request configuration")
+	}
+
+	if err := json.Unmarshal([]byte(data), config); err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
 // NewTransport creates a new transport using the given configuration.
-func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
+func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.StdlibTransport, error) {
 	dialer := &net.Dialer{
 		Timeout:   DefaultHttpTimeout,
 		KeepAlive: DefaultHttpKeepAlive,
 	}
+
+	config := DefaultConfig
 
 	if config.HttpTimeout != 0 {
 		dialer.Timeout = time.Duration(config.HttpTimeout) * time.Second
@@ -78,17 +102,29 @@ func NewTransport(config *TransportConfig) (*oohttp.StdlibTransport, error) {
 		dialer.KeepAlive = time.Duration(config.HttpKeepAliveInterval) * time.Second
 	}
 
-	tlsFactory := &internalTls.FactoryWithClientHelloId{}
+	var spec *utls.ClientHelloSpec
+	clientHelloID := config.Fingerprint.ToClientHelloId()
 
-	if config.HexClientHello != "" {
-		spec, err := config.HexClientHello.ToClientHelloId()
-		if err != nil {
-			return nil, fmt.Errorf("create spec from client hello: %w", err)
+	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
+		if !config.UseInterceptedFingerprint {
+			return clientHelloID, spec
 		}
-		tlsFactory.ClientHelloSpec = spec
-	} else if config.Fingerprint != "" {
-		tlsFactory.ClientHelloID = config.Fingerprint.ToClientHelloId()
+
+		interceptedFingerprint := getInterceptedFingerprint(sni)
+
+		if interceptedFingerprint == "" {
+			return clientHelloID, spec
+		}
+
+		interceptedSpec, err := internalTls.HexClientHello(interceptedFingerprint).ToClientHelloSpec()
+		if err == nil {
+			return &utls.HelloCustom, interceptedSpec
+		}
+
+		return clientHelloID, spec
 	}
+
+	tlsFactory := &internalTls.FactoryWithClientHelloId{GetClientHello: getClientHello}
 
 	transport := &oohttp.Transport{
 		Proxy:                 oohttp.ProxyFromEnvironment,
