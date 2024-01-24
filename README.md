@@ -60,6 +60,13 @@ See [workflows](.github/workflows) for the target programming language versions.
 
 You should now have one jar file (usually located at `./build/libs`) that works with Burp on your operating system.
 
+## Sponsors
+
+[![capsolver](https://i.ibb.co/HKMpT3r/image.png)](https://www.capsolver.com/)
+
+Maintenance of this project is made possible by all the lovely contributors and sponsors.
+If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+
 ## Credits
 Special thanks to the maintainers of the following repositories:
 - [refraction-networking/utls](https://github.com/refraction-networking/utls)
