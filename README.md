@@ -61,9 +61,6 @@ See [workflows](.github/workflows) for the target programming language versions.
 You should now have one jar file (usually located at `./build/libs`) that works with Burp on your operating system.
 
 ## Sponsors
-[![capsolver](https://s13.gifyu.com/images/S0Ovf.gif)](https://capsolver.com?utm_source=github&utm_medium=banner_github&utm_campaign=burp-awesome-tls)
-
-[Capsolver.com](https://capsolver.com?utm_source=github&utm_medium=banner_github&utm_campaign=burp-awesome-tls) is an AI-powered service that provides automatic captcha solving capabilities. It supports a range of captcha types, including reCAPTCHA, hCaptcha, and FunCaptcha, AWS Captcha, Geetest, Akamai Web, BMP, Imperva / Incapsula, image captcha among others.
 
 ---
 
