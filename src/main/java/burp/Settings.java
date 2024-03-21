@@ -9,6 +9,7 @@ public class Settings {
     private final String interceptProxyAddress = "InterceptProxyAddress";
     private final String burpProxyAddress = "BurpProxyAddress";
     private final String fingerprint = "Fingerprint";
+    private final String hexClientHello = "HexClientHello";
     private final String useInterceptedFingerprint = "UseInterceptedFingerprint";
     private final String httpTimeout = "HttpTimeout";
     private final String httpKeepAliveInterval = "HttpKeepAliveInterval";
@@ -123,6 +124,10 @@ public class Settings {
     public void setFingerprint(String fingerprint) {
         this.write(this.fingerprint, fingerprint);
     }
+
+    public String getHexClientHello() { return this.read(this.hexClientHello); }
+
+    public void setHexClientHello(String hexClientHello) { this.write(this.hexClientHello, hexClientHello); }
 
     public int getIdleConnTimeout() {
         return Integer.parseInt(this.read(this.idleConnTimeout));

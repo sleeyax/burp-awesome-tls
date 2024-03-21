@@ -37,5 +37,11 @@ func (f *FactoryWithClientHelloId) NewUTLSConn(conn net.Conn, config *tls.Config
 
 	clientHelloID, spec := f.GetClientHello(config.ServerName)
 
+	if spec != nil {
+		clientHelloID = &utls.HelloCustom
+	} else if clientHelloID == nil {
+		clientHelloID = DefaultClientHelloID
+	}
+
 	return &uconnAdapter{UConn: utls.UClient(conn, uConfig, *clientHelloID), spec: spec}
 }

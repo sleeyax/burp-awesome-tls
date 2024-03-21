@@ -46,6 +46,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
 
             var transportConfig = new TransportConfig();
             transportConfig.Fingerprint = this.settings.getFingerprint();
+            transportConfig.HexClientHello = this.settings.getHexClientHello();
             transportConfig.HttpTimeout = this.settings.getHttpTimeout();
             transportConfig.HttpKeepAliveInterval = this.settings.getHttpKeepAliveInterval();
             transportConfig.IdleConnTimeout = this.settings.getIdleConnTimeout();
