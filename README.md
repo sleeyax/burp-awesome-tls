@@ -36,9 +36,7 @@ This magic header is stripped from the request before it's forwarded to the dest
 ## Configuration
 This extension is 'plug and play' and should speak for itself. You can hover with your mouse over each field in the 'Awesome TLS' tab for more information about each field.
 
-You can either enable an additional proxy listener that will automatically apply the current fingerprint or load your custom Client Hello. You can capture it in Wireshark, copy the client hello record as a hex stream, and paste it into the field "Hex Client Hello".
-
-If you neither enable the proxy listener nor set a custom client hello hex, it will use the pre-configured fingerprints that you can select from the drop-down menu.
+To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
 ![screenshot](./docs/wireshark_capture_client_hello.png)
 
 <details>
