@@ -36,6 +36,9 @@ This magic header is stripped from the request before it's forwarded to the dest
 ## Configuration
 This extension is 'plug and play' and should speak for itself. You can hover with your mouse over each field in the 'Awesome TLS' tab for more information about each field.
 
+To load your custom Client Hello, you can capture it in Wireshark, copy client hello record as hex stream and paste it into the field "Hex Client Hello".
+![screenshot](./docs/wireshark_capture_client_hello.png)
+
 <details>
   <summary>Advanced usage</summary>
   

@@ -22,6 +22,7 @@ func main() {
 		InterceptProxyAddr:        server.DefaultInterceptProxyAddress,
 		BurpAddr:                  server.DefaultBurpProxyAddress,
 		Fingerprint:               tls.DefaultFingerprint,
+		HexClientHello:            "",
 		UseInterceptedFingerprint: false,
 		HttpTimeout:               int(internal.DefaultHttpTimeout.Seconds()),
 		HttpKeepAliveInterval:     int(internal.DefaultHttpKeepAlive.Seconds()),

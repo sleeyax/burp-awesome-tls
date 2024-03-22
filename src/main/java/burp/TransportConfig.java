@@ -21,6 +21,11 @@ public class TransportConfig {
     public String Fingerprint;
 
     /*
+     * Hexadecimal Client Hello
+     */
+    public String HexClientHello;
+
+    /*
      * Use intercepted fingerprint from request;
      */
     public Boolean UseInterceptedFingerprint;
