@@ -6,6 +6,21 @@ It does this without resorting to hacks, reflection or forked Burp Suite Communi
 
 ![screenshot](./docs/settings.png)
 
+---
+
+## Sponsors
+
+<a href="https://scrapfly.io/?utm_source=github&utm_medium=sponsoring&utm_campaign=burp-awesome-tls" target="_blank"><img src="https://cdn.scrapfly.io/0.0.657/www/public/svg/logo.svg?version=0.0.657" alt="scrapfly.io logo" width="150"></a>
+
+[Scrapfly](https://scrapfly.io/?utm_source=github&utm_medium=sponsoring&utm_campaign=burp-awesome-tls) is an enterprise-grade solution providing Web Scraping API that aims to simplify the scraping process by managing everything: real browser rendering, rotating proxies, and fingerprints (TLS, HTTP, browser) to bypass all major anti-bots. Scrapfly also unlocks observability by providing an analytical dashboard and measuring the success rate/block rate in detail. 
+
+[Scrapfly](https://scrapfly.io/?utm_source=github&utm_medium=sponsoring&utm_campaign=burp-awesome-tls) is a good solution if you are looking for a robust solution to access the website behind WAF for web scraping use cases - We also provide a set of tools to verify your [TLS fingerprint](https://scrapfly.io/web-scraping-tools/ja3-fingerprint?utm_source=github&utm_medium=sponsoring&utm_campaign=burp-awesome-tls) and [HTTP/2 Fingerprint](https://scrapfly.io/web-scraping-tools/http2-fingerprint?utm_source=github&utm_medium=sponsoring&utm_campaign=burp-awesome-tls).
+
+> Maintenance of this project is made possible by all the lovely contributors and sponsors.
+If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+
+---
+
 ## Showcase
 [CloudFlare bot score](https://cloudflare.manfredi.io/en/tools/connection):
 
@@ -62,13 +77,6 @@ See [workflows](.github/workflows) for the target programming language versions.
 3. Build the jar with Gradle: `gradle buildJar`.
 
 You should now have one jar file (usually located at `./build/libs`) that works with Burp on your operating system.
-
-## Sponsors
-
----
-
-> Maintenance of this project is made possible by all the lovely contributors and sponsors.
-If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
 
 ## Credits
 Special thanks to the maintainers of the following repositories:
