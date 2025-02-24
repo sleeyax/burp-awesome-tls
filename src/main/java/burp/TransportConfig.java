@@ -2,9 +2,18 @@ package burp;
 
 
 /**
- * Represents the configuration for a transport.
+ * Represents the configuration for transport.
  */
 public class TransportConfig {
+    /*
+     * Hostname.
+     */
+    public String Host;
+
+    /**
+     * Protocol scheme (HTTP or HTTPS).
+     */
+    public String Scheme;
 
     /**
      * Intercept ClientHello Proxy Address.

@@ -113,4 +113,15 @@ public class Settings {
                 "firefox_133",
         };
     }
+
+    public TransportConfig toTransportConfig() {
+        var transportConfig = new TransportConfig();
+        transportConfig.Fingerprint = this.getFingerprint();
+        transportConfig.HexClientHello = this.getHexClientHello();
+        transportConfig.HttpTimeout = this.getHttpTimeout();
+        transportConfig.UseInterceptedFingerprint = this.getUseInterceptedFingerprint();
+        transportConfig.BurpAddr = this.getBurpProxyAddress();
+        transportConfig.InterceptProxyAddr = this.getInterceptProxyAddress();
+        return transportConfig;
+    }
 }

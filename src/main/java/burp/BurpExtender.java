@@ -1,7 +1,6 @@
 package burp;
 
 import com.google.gson.Gson;
-import com.sun.jna.Native;
 
 import java.io.PrintWriter;
 import java.net.URL;
@@ -43,18 +42,6 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
                 out.println(err);
                 if (!isGraceful) callbacks.unloadExtension(); // fatal error; disable the extension
             }
-
-            var transportConfig = new TransportConfig();
-            transportConfig.Fingerprint = this.settings.getFingerprint();
-            transportConfig.HexClientHello = this.settings.getHexClientHello();
-            transportConfig.HttpTimeout = this.settings.getHttpTimeout();
-            transportConfig.UseInterceptedFingerprint = this.settings.getUseInterceptedFingerprint();
-            var goConfigJSON = this.gson.toJson(transportConfig);
-
-            err = ServerLibrary.INSTANCE.SaveSettings(goConfigJSON);
-            if (!err.equals("")) {
-                this.stdout.println(err);
-            }
         }).start();
     }
 
@@ -65,7 +52,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IExtensionSta
         var httpService = messageInfo.getHttpService();
         var req = this.helpers.analyzeRequest(messageInfo.getRequest());
 
-        var transportConfig = new RequestConfig();
+        var transportConfig = this.settings.toTransportConfig();
         transportConfig.Host = httpService.getHost();
         transportConfig.Scheme = httpService.getProtocol();
         var goConfigJSON = this.gson.toJson(transportConfig);

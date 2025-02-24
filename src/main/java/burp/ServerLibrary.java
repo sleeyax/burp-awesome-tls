@@ -10,6 +10,5 @@ public interface ServerLibrary extends Library {
     String StartServer(String spoofAddr);
     String StopServer();
 
-    String SaveSettings(String config);
     void SmokeTest();
 }

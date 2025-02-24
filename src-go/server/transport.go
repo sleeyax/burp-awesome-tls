@@ -9,19 +9,15 @@ import (
 	"github.com/bogdanfinn/tls-client/profiles"
 	utls "github.com/bogdanfinn/utls"
 	"strings"
-	"time"
 )
 
-const DefaultHttpTimeout = time.Duration(30) * time.Second
-
-var DefaultConfig TransportConfig
-
-type RequestConfig struct {
-	Host   string
-	Scheme string
-}
-
 type TransportConfig struct {
+	// Hostname.
+	Host string
+
+	// Protocol scheme (HTTP or HTTPS).
+	Scheme string
+
 	// InterceptProxyAddr to intercept client tls fingerprint
 	InterceptProxyAddr string
 
@@ -56,23 +52,7 @@ func ParseTransportConfig(data string) (*TransportConfig, error) {
 	return config, nil
 }
 
-func ParseRequestConfig(data string) (*RequestConfig, error) {
-	config := &RequestConfig{}
-
-	if strings.TrimSpace(data) == "" {
-		return nil, errors.New("missing request configuration")
-	}
-
-	if err := json.Unmarshal([]byte(data), config); err != nil {
-		return nil, err
-	}
-
-	return config, nil
-}
-
-func NewClient() (tls_client.HttpClient, error) {
-	config := DefaultConfig
-
+func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 	options := []tls_client.HttpClientOption{
 		tls_client.WithNotFollowRedirects(),
 		tls_client.WithInsecureSkipVerify(),
