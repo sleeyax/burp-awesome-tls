@@ -7,11 +7,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-
-	"server/internal"
-	"server/internal/tls"
-
 	"server"
+	"server/internal"
 )
 
 func main() {
@@ -19,15 +16,10 @@ func main() {
 	flag.Parse()
 
 	defaultConfig, err := json.Marshal(internal.TransportConfig{
-		InterceptProxyAddr:        server.DefaultInterceptProxyAddress,
-		BurpAddr:                  server.DefaultBurpProxyAddress,
-		Fingerprint:               tls.DefaultFingerprint,
-		HexClientHello:            "",
-		UseInterceptedFingerprint: false,
-		HttpTimeout:               int(internal.DefaultHttpTimeout.Seconds()),
-		HttpKeepAliveInterval:     int(internal.DefaultHttpKeepAlive.Seconds()),
-		IdleConnTimeout:           int(internal.DefaultIdleConnTimeout.Seconds()),
-		TLSHandshakeTimeout:       int(internal.DefaultTLSHandshakeTimeout.Seconds()),
+		InterceptProxyAddr: server.DefaultInterceptProxyAddress,
+		BurpAddr:           server.DefaultBurpProxyAddress,
+		HttpTimeout:        int(internal.DefaultHttpTimeout.Seconds()),
+		Fingerprint:        "default",
 	})
 	if err != nil {
 		log.Fatalln(err)

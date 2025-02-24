@@ -17,7 +17,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="65d0" binding="panelSettings" layout-manager="GridLayoutManager" row-count="16" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="65d0" binding="panelSettings" layout-manager="GridLayoutManager" row-count="10" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <tabbedpane title="settings"/>
@@ -79,58 +79,10 @@
                   <toolTipText value="The maximum amount of time a dial will wait for a connect to complete."/>
                 </properties>
               </component>
-              <component id="e91b6" class="javax.swing.JLabel" binding="labelKeepAlive">
-                <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Http keep alive interval"/>
-                </properties>
-              </component>
-              <component id="bd213" class="javax.swing.JSpinner" binding="spinnerKeepAlive">
-                <constraints>
-                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <toolTipText value="Specifies the interval between keep-alive probes for an active network connection."/>
-                </properties>
-              </component>
-              <component id="a2f49" class="javax.swing.JLabel" binding="labelIdleConnTimeout">
-                <constraints>
-                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Idle connection timeout"/>
-                </properties>
-              </component>
-              <component id="5efb6" class="javax.swing.JSpinner" binding="spinnerIdleConnTimeout">
-                <constraints>
-                  <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <toolTipText value="The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself."/>
-                </properties>
-              </component>
-              <component id="e4f58" class="javax.swing.JLabel" binding="labelTlsHandshakeTimeout">
-                <constraints>
-                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="TLS handshake timeout"/>
-                </properties>
-              </component>
-              <component id="2b2e5" class="javax.swing.JSpinner" binding="spinnerTlsHandshakeTimeout">
-                <constraints>
-                  <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <toolTipText value="The maximum amount of time to wait for a TLS handshake."/>
-                </properties>
-              </component>
               <grid id="4bfb5" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
-                  <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
@@ -159,7 +111,7 @@
               </component>
               <component id="da183" class="javax.swing.JButton" binding="buttonSave">
                 <constraints>
-                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="Save all settings"/>

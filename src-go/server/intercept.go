@@ -6,17 +6,16 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	utls "github.com/bogdanfinn/utls"
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
-
-	http "github.com/ooni/oohttp"
-	"github.com/open-ch/ja3"
 )
 
 const (
@@ -194,14 +193,24 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		readClientHello = true
 
-		j, err := ja3.ComputeJA3FromSegment(clientHello)
+		// read SNI from the client hello
+		// the SNI is used as the key to store the client hello data in the cache
+		fingerprinter := &utls.Fingerprinter{}
+		spec, err := fingerprinter.RawClientHello(clientHello)
 		if err != nil {
 			s.writeError(err)
 			return
 		}
+		sniExtension := spec.Extensions[utls.ExtensionServerName]
+		var sniBytes []byte
+		if _, err := sniExtension.Read(sniBytes); err != nil {
+			s.writeError(fmt.Errorf("failed to read SNI: %w", err))
+			return
+		}
+		sni := string(sniBytes)
 
 		s.mutex.Lock()
-		s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
+		s.clientHelloData[sni] = hex.EncodeToString(clientHello)
 		s.mutex.Unlock()
 	}
 }

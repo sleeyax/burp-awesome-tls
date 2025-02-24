@@ -4,23 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
+	"github.com/bogdanfinn/fhttp/http2"
+	tls_client "github.com/bogdanfinn/tls-client"
+	"github.com/bogdanfinn/tls-client/profiles"
+	utls "github.com/bogdanfinn/utls"
 	"strings"
 	"time"
-
-	utls "github.com/refraction-networking/utls"
-
-	internalTls "server/internal/tls"
-
-	oohttp "github.com/ooni/oohttp"
 )
 
-const (
-	DefaultHttpTimeout         = time.Duration(30) * time.Second
-	DefaultHttpKeepAlive       = time.Duration(30) * time.Second
-	DefaultIdleConnTimeout     = time.Duration(90) * time.Second
-	DefaultTLSHandshakeTimeout = time.Duration(10) * time.Second
-)
+const DefaultHttpTimeout = time.Duration(30) * time.Second
 
 var DefaultConfig TransportConfig
 
@@ -37,26 +29,14 @@ type TransportConfig struct {
 	BurpAddr string
 
 	// The TLS fingerprint to use.
-	Fingerprint internalTls.Fingerprint
+	Fingerprint string
 
 	// Hexadecimal Client Hello to use
-	HexClientHello internalTls.HexClientHello
+	HexClientHello HexClientHello
 
 	// The maximum amount of time a dial will wait for a connect to complete.
 	// Defaults to [DefaultHttpTimeout].
 	HttpTimeout int
-
-	// Specifies the interval between keep-alive probes for an active network connection.
-	// Defaults to [DefaultHttpKeepAlive].
-	HttpKeepAliveInterval int
-
-	// The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself.
-	// Defaults to [DefaultIdleConnTimeout].
-	IdleConnTimeout int
-
-	// The maximum amount of time to wait for a TLS handshake.
-	// Defaults to [DefaultTLSHandshakeTimeout].
-	TLSHandshakeTimeout int
 
 	// UseInterceptedFingerprint use intercepted fingerprint
 	UseInterceptedFingerprint bool
@@ -90,86 +70,58 @@ func ParseRequestConfig(data string) (*RequestConfig, error) {
 	return config, nil
 }
 
-// NewTransport creates a new transport using the given configuration.
-func NewTransport(getInterceptedFingerprint func(sni string) string) (*oohttp.StdlibTransport, error) {
-	dialer := &net.Dialer{
-		Timeout:   DefaultHttpTimeout,
-		KeepAlive: DefaultHttpKeepAlive,
-	}
-
+func NewClient() (tls_client.HttpClient, error) {
 	config := DefaultConfig
 
-	if config.HttpTimeout != 0 {
-		dialer.Timeout = time.Duration(config.HttpTimeout) * time.Second
-	}
-	if config.HttpKeepAliveInterval != 0 {
-		dialer.KeepAlive = time.Duration(config.HttpKeepAliveInterval) * time.Second
+	options := []tls_client.HttpClientOption{
+		tls_client.WithNotFollowRedirects(),
+		tls_client.WithInsecureSkipVerify(),
 	}
 
-	var clientHelloSpec *utls.ClientHelloSpec
-	var clientHelloID *utls.ClientHelloID
+	if config.HttpTimeout != 0 {
+		options = append(options, tls_client.WithTimeoutSeconds(config.HttpTimeout))
+	}
+
+	if config.Fingerprint != "" {
+		var clientProfile profiles.ClientProfile
+		if strings.ToLower(config.Fingerprint) == "default" {
+			clientProfile = profiles.DefaultClientProfile
+		} else {
+			var ok bool
+			if clientProfile, ok = profiles.MappedTLSClients[config.Fingerprint]; !ok {
+				return nil, fmt.Errorf("failed to create client profile for unrecognized fingerprint '%s'", config.Fingerprint)
+			}
+		}
+
+		options = append(options, tls_client.WithClientProfile(clientProfile))
+	}
 
 	if config.HexClientHello != "" {
-		spec, err := config.HexClientHello.ToClientHelloSpec()
-		if err != nil {
-			return nil, fmt.Errorf("create spec from client hello: %w", err)
-		}
-		clientHelloSpec = spec
-	} else if config.Fingerprint != "" {
-		clientHelloID = config.Fingerprint.ToClientHelloId()
-	}
-
-	getClientHello := func(sni string) (*utls.ClientHelloID, *utls.ClientHelloSpec) {
-		if !config.UseInterceptedFingerprint || config.HexClientHello != "" {
-			return clientHelloID, clientHelloSpec
+		customClientHelloID := utls.ClientHelloID{
+			Client:  "Custom",
+			Version: "1",
+			SpecFactory: func() (utls.ClientHelloSpec, error) {
+				return config.HexClientHello.ToClientHelloSpec()
+			},
 		}
 
-		interceptedFingerprint := getInterceptedFingerprint(sni)
+		customClientProfile := profiles.NewClientProfile(
+			customClientHelloID,
+			make(map[http2.SettingID]uint32),
+			make([]http2.SettingID, 0),
+			make([]string, 0),
+			0,
+			make([]http2.Priority, 0),
+			nil,
+		)
 
-		if interceptedFingerprint == "" {
-			return clientHelloID, clientHelloSpec
-		}
-
-		interceptedSpec, err := internalTls.HexClientHello(interceptedFingerprint).ToClientHelloSpec()
-		if err == nil {
-			return &utls.HelloCustom, interceptedSpec
-		}
-
-		return clientHelloID, clientHelloSpec
+		options = append(options, tls_client.WithClientProfile(customClientProfile))
 	}
 
-	tlsFactory := &internalTls.FactoryWithClientHelloId{GetClientHello: getClientHello}
-
-	transport := &oohttp.Transport{
-		Proxy:                 oohttp.ProxyFromEnvironment,
-		DialContext:           dialer.DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       DefaultIdleConnTimeout,
-		TLSHandshakeTimeout:   DefaultTLSHandshakeTimeout,
-		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientFactory:      tlsFactory.NewUTLSConn,
+	client, err := tls_client.NewHttpClient(tls_client.NewNoopLogger(), options...)
+	if err != nil {
+		return nil, err
 	}
 
-	// add realistic initial HTTP2 SETTINGS to Chrome browser fingerprints
-	if strings.HasPrefix(string(config.Fingerprint), "Chrome") {
-		transport.EnableCustomInitialSettings()
-		transport.HeaderTableSize = 4096 // 65536 // TODO: 4096 seems to be the max; modify oohtpp fork (see `http2/hpack` package) to support higher value
-		transport.EnablePush = 0
-		transport.MaxConcurrentStreams = 1000
-		transport.InitialWindowSize = 6291456
-		transport.MaxFrameSize = 16384
-		transport.MaxHeaderListSize = 262144
-	}
-
-	if config.IdleConnTimeout != 0 {
-		transport.IdleConnTimeout = time.Duration(config.IdleConnTimeout) * time.Second
-	}
-	if config.TLSHandshakeTimeout != 0 {
-		transport.TLSHandshakeTimeout = time.Duration(config.TLSHandshakeTimeout) * time.Second
-	}
-
-	return &oohttp.StdlibTransport{
-		Transport: transport,
-	}, nil
+	return client, nil
 }

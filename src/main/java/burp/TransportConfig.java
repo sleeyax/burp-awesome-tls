@@ -35,23 +35,5 @@ public class TransportConfig {
      * Defaults to [DefaultHttpTimeout].
      */
     public int HttpTimeout;
-
-    /**
-     * Specifies the interval between keep-alive probes for an active network connection.
-     * Defaults to [DefaultHttpKeepAlive].
-     */
-    public int HttpKeepAliveInterval;
-
-    /**
-     * The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself.
-     * Defaults to [DefaultIdleConnTimeout].
-     */
-    public int IdleConnTimeout;
-
-    /**
-     * The maximum amount of time to wait for a TLS handshake.
-     * Defaults to [DefaultTLSHandshakeTimeout].
-     */
-    public int TlsHandshakeTimeout;
 }
 

@@ -2,15 +2,12 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
+	fhttp "github.com/bogdanfinn/fhttp"
+	utls "github.com/bogdanfinn/utls"
 	"io"
 	"net"
-	"strings"
-
 	"server/internal"
-
-	http "github.com/ooni/oohttp"
 )
 
 const (
@@ -28,27 +25,25 @@ const (
 const ConfigurationHeaderKey = "Awesometlsconfig"
 
 var (
-	s         *http.Server
+	s         *fhttp.Server
 	proxy     *interceptProxy
 	isProxyOn bool
 )
 
 func init() {
-	s = &http.Server{}
+	s = &fhttp.Server{}
 }
 
 func StartServer(addr string) error {
-	s = &http.Server{}
+	s = &fhttp.Server{}
 
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
 		return fmt.Errorf("NewCertificateAuthority, err: %w", err)
 	}
 
-	m := http.NewServeMux()
-	m.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		http.EnableHeaderOrder(w)
-
+	m := fhttp.NewServeMux()
+	m.HandleFunc("/", func(w fhttp.ResponseWriter, req *fhttp.Request) {
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
 		req.Header.Del(ConfigurationHeaderKey)
 
@@ -58,7 +53,7 @@ func StartServer(addr string) error {
 			return
 		}
 
-		transport, err := internal.NewTransport(proxy.getTLSFingerprint)
+		client, err := internal.NewClient()
 		if err != nil {
 			writeError(w, err)
 			return
@@ -66,14 +61,9 @@ func StartServer(addr string) error {
 
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
-		if strings.HasPrefix(string(internal.DefaultConfig.Fingerprint), "Chrome") {
-			pHeaderOrder := []string{":method", ":authority", ":scheme", ":path"}
-			for _, pHeader := range pHeaderOrder {
-				req.Header.Add(http.PHeaderOrderKey, pHeader)
-			}
-		}
+		req.RequestURI = ""
 
-		res, err := transport.RoundTrip(req)
+		res, err := client.Do(req)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -97,8 +87,8 @@ func StartServer(addr string) error {
 
 	s.Addr = addr
 	s.Handler = m
-	s.TLSConfig = &tls.Config{
-		Certificates: []tls.Certificate{
+	s.TLSConfig = &utls.Config{
+		Certificates: []utls.Certificate{
 			{
 				Certificate: [][]byte{ca.Raw},
 				PrivateKey:  private,
@@ -113,7 +103,7 @@ func StartServer(addr string) error {
 		return fmt.Errorf("listen, err: %w", err)
 	}
 
-	tlsListener := tls.NewListener(listener, s.TLSConfig)
+	tlsListener := utls.NewListener(listener, s.TLSConfig)
 
 	if err := s.Serve(tlsListener); err != nil {
 		return fmt.Errorf("serve, err: %w", err)
@@ -169,7 +159,7 @@ func StopServer() error {
 	return s.Shutdown(context.Background())
 }
 
-func writeError(w http.ResponseWriter, err error) {
+func writeError(w fhttp.ResponseWriter, err error) {
 	w.WriteHeader(500)
 	fmt.Fprint(w, fmt.Errorf("Awesome TLS error: %s", err))
 	fmt.Println(err)
