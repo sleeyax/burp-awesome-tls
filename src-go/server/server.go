@@ -7,7 +7,6 @@ import (
 	utls "github.com/bogdanfinn/utls"
 	"io"
 	"net"
-	"server/internal"
 )
 
 const (
@@ -47,13 +46,13 @@ func StartServer(addr string) error {
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
 		req.Header.Del(ConfigurationHeaderKey)
 
-		config, err := internal.ParseRequestConfig(configHeader)
+		config, err := ParseRequestConfig(configHeader)
 		if err != nil {
 			writeError(w, err)
 			return
 		}
 
-		client, err := internal.NewClient()
+		client, err := NewClient()
 		if err != nil {
 			writeError(w, err)
 			return
@@ -113,7 +112,7 @@ func StartServer(addr string) error {
 }
 
 func SaveSettings(configJson string) error {
-	config, err := internal.ParseTransportConfig(configJson)
+	config, err := ParseTransportConfig(configJson)
 	if err != nil {
 		return err
 	}
@@ -130,7 +129,7 @@ func SaveSettings(configJson string) error {
 		isProxyOn = false
 	}
 
-	internal.DefaultConfig = *config
+	DefaultConfig = *config
 
 	return nil
 }

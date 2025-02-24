@@ -8,17 +8,16 @@ import (
 	"fmt"
 	"log"
 	"server"
-	"server/internal"
 )
 
 func main() {
 	spoofAddr := flag.String("spoof", server.DefaultSpoofProxyAddress, "Spoof proxy address to listen on ([ip:]port)")
 	flag.Parse()
 
-	defaultConfig, err := json.Marshal(internal.TransportConfig{
+	defaultConfig, err := json.Marshal(server.TransportConfig{
 		InterceptProxyAddr: server.DefaultInterceptProxyAddress,
 		BurpAddr:           server.DefaultBurpProxyAddress,
-		HttpTimeout:        int(internal.DefaultHttpTimeout.Seconds()),
+		HttpTimeout:        int(server.DefaultHttpTimeout.Seconds()),
 		Fingerprint:        "default",
 	})
 	if err != nil {
