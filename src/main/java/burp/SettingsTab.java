@@ -3,12 +3,11 @@ package burp;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class SettingsTab implements ITab {
+public class SettingsTab {
     private JComboBox comboBoxFingerprint;
     private JPanel panelMain;
     private JLabel labelFingerprint;
@@ -29,17 +28,7 @@ public class SettingsTab implements ITab {
     private JLabel labelHexClientHello;
     private JTextField textFieldHexClientHello;
 
-    @Override
-    public String getTabCaption() {
-        return "Awesome TLS";
-    }
-
-    @Override
-    public Component getUiComponent() {
-        return panelMain;
-    }
-
-    public SettingsTab(Settings settings, IBurpExtenderCallbacks callbacks) {
+    public SettingsTab(Settings settings) {
         textFieldInterceptProxyAddress.setText(settings.getInterceptProxyAddress());
         textFieldBurpProxyAddress.setText(settings.getBurpProxyAddress());
         textFieldSpoofProxyAddress.setText(settings.getSpoofProxyAddress());
@@ -51,24 +40,22 @@ public class SettingsTab implements ITab {
         }
         comboBoxFingerprint.setSelectedItem(settings.getFingerprint());
 
-        buttonSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setSpoofProxyAddress(textFieldSpoofProxyAddress.getText());
-                settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
-                settings.setHexClientHello(textFieldHexClientHello.getText());
-                settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
-            }
+        buttonSave.addActionListener(e -> {
+            settings.setSpoofProxyAddress(textFieldSpoofProxyAddress.getText());
+            settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
+            settings.setHexClientHello(textFieldHexClientHello.getText());
+            settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
         });
 
-        buttonSaveAdvanced.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
-                settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
-                settings.setUseInterceptedFingerprint(checkBoxButtonUseInterceptedFingerprint.isSelected());
-            }
+        buttonSaveAdvanced.addActionListener(e -> {
+            settings.setInterceptProxyAddress(textFieldInterceptProxyAddress.getText());
+            settings.setBurpProxyAddress(textFieldBurpProxyAddress.getText());
+            settings.setUseInterceptedFingerprint(checkBoxButtonUseInterceptedFingerprint.isSelected());
         });
+    }
+
+    public JPanel getUI() {
+        return this.panelMain;
     }
 
     {
