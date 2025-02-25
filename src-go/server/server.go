@@ -103,7 +103,7 @@ func StartServer(addr string) error {
 				Leaf:        ca,
 			},
 		},
-		NextProtos: []string{"http/1.1", "h2"},
+		NextProtos: []string{"http/1.1"},
 	}
 
 	listener, err := net.Listen("tcp", s.Addr)
