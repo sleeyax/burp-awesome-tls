@@ -105,13 +105,7 @@ public class Settings {
     public void setHexClientHello(String hexClientHello) { this.write(this.hexClientHello, hexClientHello); }
 
     public String[] getFingerprints() {
-        return new String[]{
-               "chrome_103",
-                "chrome_112",
-                "chrome_116_PSK",
-                "chrome_116_PSK_PQ",
-                "firefox_133",
-        };
+        return ServerLibrary.INSTANCE.GetFingerprints().split("\n");
     }
 
     public TransportConfig toTransportConfig() {

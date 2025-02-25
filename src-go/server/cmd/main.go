@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"server"
+	"strings"
 )
 
 func main() {
@@ -35,4 +36,9 @@ func StopServer() *C.char {
 //export SmokeTest
 func SmokeTest() {
 	fmt.Println("smoke test success")
+}
+
+//export GetFingerprints
+func GetFingerprints() *C.char {
+	return C.CString(strings.Join(server.GetFingerprints(), "\n"))
 }

@@ -9,6 +9,7 @@ public interface ServerLibrary extends Library {
 
     String StartServer(String spoofAddr);
     String StopServer();
+    String GetFingerprints();
 
     void SmokeTest();
 }
