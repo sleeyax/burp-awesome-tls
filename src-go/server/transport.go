@@ -92,14 +92,15 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 			},
 		}
 
+		defaultProfile := profiles.DefaultClientProfile
 		customClientProfile := profiles.NewClientProfile(
 			customClientHelloID,
-			nil,
-			nil,
-			nil,
-			0,
-			nil,
-			nil,
+			defaultProfile.GetSettings(),
+			defaultProfile.GetSettingsOrder(),
+			defaultProfile.GetPseudoHeaderOrder(),
+			defaultProfile.GetConnectionFlow(),
+			defaultProfile.GetPriorities(),
+			defaultProfile.GetHeaderPriority(),
 		)
 
 		options = append(options, tls_client.WithClientProfile(customClientProfile))
