@@ -34,6 +34,12 @@ func (hexClientHello HexClientHello) ToClientHelloSpec() (utls.ClientHelloSpec, 
 				spec.Extensions[i] = utls.BoringGREASEECH()
 			}
 		}
+
+		// If the PSK extension already contains a key, it's identified as a 'fake PSK' extensions by utls.
+		// So we replace it with a real PSK extension.
+		if _, ok := extension.(*utls.FakePreSharedKeyExtension); ok {
+			spec.Extensions[i] = &utls.UtlsPreSharedKeyExtension{}
+		}
 	}
 
 	return *spec, nil
