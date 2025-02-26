@@ -61,6 +61,12 @@ func StartServer(addr string) error {
 			isProxyOn = false
 		}
 
+		if proxy != nil {
+			if interceptedFingerprint := proxy.getTLSFingerprint(); interceptedFingerprint != "" && config.UseInterceptedFingerprint {
+				config.HexClientHello = HexClientHello(interceptedFingerprint)
+			}
+		}
+
 		client, err := NewClient(config)
 		if err != nil {
 			writeError(w, err)

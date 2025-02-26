@@ -64,20 +64,10 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 		options = append(options, tls_client.WithTimeoutSeconds(config.HttpTimeout))
 	}
 
-	if config.Fingerprint != "" {
-		var clientProfile profiles.ClientProfile
-		if strings.ToLower(config.Fingerprint) == "default" {
-			clientProfile = profiles.DefaultClientProfile
-		} else {
-			var ok bool
-			if clientProfile, ok = profiles.MappedTLSClients[config.Fingerprint]; !ok {
-				return nil, fmt.Errorf("failed to create client profile for unrecognized fingerprint '%s'", config.Fingerprint)
-			}
-		}
-
-		options = append(options, tls_client.WithClientProfile(clientProfile))
-	}
-
+	// The order of precedence is:
+	// 1. Custom client hello from intercept proxy
+	// 2. Custom client hello from hex string
+	// 3. Preconfigured fingerprint
 	if config.HexClientHello != "" {
 		customClientHelloSpec, err := config.HexClientHello.ToClientHelloSpec()
 		if err != nil {
@@ -104,6 +94,18 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 		)
 
 		options = append(options, tls_client.WithClientProfile(customClientProfile))
+	} else if config.Fingerprint != "" {
+		var clientProfile profiles.ClientProfile
+		if strings.ToLower(config.Fingerprint) == "default" {
+			clientProfile = profiles.DefaultClientProfile
+		} else {
+			var ok bool
+			if clientProfile, ok = profiles.MappedTLSClients[config.Fingerprint]; !ok {
+				return nil, fmt.Errorf("failed to create client profile for unrecognized fingerprint '%s'", config.Fingerprint)
+			}
+		}
+
+		options = append(options, tls_client.WithClientProfile(clientProfile))
 	}
 
 	client, err := tls_client.NewHttpClient(tls_client.NewNoopLogger(), options...)

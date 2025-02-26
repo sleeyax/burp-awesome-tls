@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	utls "github.com/bogdanfinn/utls"
 	"io"
 	"log"
 	"net"
@@ -28,7 +27,7 @@ type interceptProxy struct {
 	burpClient      *http.Client
 	burpAddr        string
 	mutex           sync.RWMutex
-	clientHelloData map[string]string
+	clientHelloData string
 	listener        net.Listener
 	ctx             context.Context
 	cancel          context.CancelFunc
@@ -55,20 +54,19 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 		burpClient: &http.Client{
 			Transport: tr,
 		},
-		burpAddr:        burpAddr,
-		mutex:           sync.RWMutex{},
-		clientHelloData: map[string]string{},
-		listener:        l,
-		ctx:             ctx,
-		cancel:          cancel,
+		burpAddr: burpAddr,
+		mutex:    sync.RWMutex{},
+		listener: l,
+		ctx:      ctx,
+		cancel:   cancel,
 	}, nil
 }
 
-func (s *interceptProxy) getTLSFingerprint(sni string) string {
+func (s *interceptProxy) getTLSFingerprint() string {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	return s.clientHelloData[sni]
+	return s.clientHelloData
 }
 
 func (s *interceptProxy) Start() {
@@ -193,24 +191,8 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		readClientHello = true
 
-		// read SNI from the client hello
-		// the SNI is used as the key to store the client hello data in the cache
-		fingerprinter := &utls.Fingerprinter{}
-		spec, err := fingerprinter.RawClientHello(clientHello)
-		if err != nil {
-			s.writeError(err)
-			return
-		}
-		sniExtension := spec.Extensions[utls.ExtensionServerName]
-		var sniBytes []byte
-		if _, err := sniExtension.Read(sniBytes); err != nil {
-			s.writeError(fmt.Errorf("failed to read SNI: %w", err))
-			return
-		}
-		sni := string(sniBytes)
-
 		s.mutex.Lock()
-		s.clientHelloData[sni] = hex.EncodeToString(clientHello)
+		s.clientHelloData = hex.EncodeToString(clientHello)
 		s.mutex.Unlock()
 	}
 }
