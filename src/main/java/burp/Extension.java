@@ -58,7 +58,8 @@ public class Extension implements BurpExtension {
             var err = ServerLibrary.INSTANCE.StartServer(settings.getSpoofProxyAddress());
             if (!err.isEmpty()) {
                 api.logging().logToError(err);
-                if (err.contains("Server stopped") || err.contains("address already in use")) {
+                var isGraceful = err.contains("Server stopped") || err.contains("address already in use");
+                if (!isGraceful) {
                     api.extension().unload(); // fatal error; disable the extension
                 }
             }
