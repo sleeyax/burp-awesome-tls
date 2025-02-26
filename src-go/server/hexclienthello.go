@@ -18,7 +18,9 @@ func (hexClientHello HexClientHello) ToClientHelloSpec() (utls.ClientHelloSpec, 
 		return utls.ClientHelloSpec{}, err
 	}
 
-	fingerprinter := &utls.Fingerprinter{}
+	fingerprinter := &utls.Fingerprinter{
+		AllowBluntMimicry: true,
+	}
 	spec, err := fingerprinter.RawClientHello(raw)
 	if err != nil {
 		return utls.ClientHelloSpec{}, err
