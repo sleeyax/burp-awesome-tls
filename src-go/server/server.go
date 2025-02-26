@@ -77,6 +77,9 @@ func StartServer(addr string) error {
 		req.URL.Scheme = config.Scheme
 		req.RequestURI = ""
 		req.Header[fhttp.HeaderOrderKey] = config.HeaderOrder
+		// The content-length header is already set by the client (internally).
+		// Leaving it here causes strange '400 bad request' errors from the destination, so we remove it.
+		req.Header.Del("Content-Length")
 
 		res, err := client.Do(req)
 		if err != nil {
