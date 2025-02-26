@@ -79,17 +79,26 @@ func StartServer(addr string) error {
 
 		defer res.Body.Close()
 
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
 		// Write the response (back to burp).
 		for k := range res.Header {
 			vv := res.Header.Values(k)
 			for _, v := range vv {
-				w.Header().Add(k, v)
+				// The response body is already automatically decompressed, so we need to update the Content-Length header accordingly.
+				// Not doing so will cause the response writer to return an error.
+				if k == "Content-Length" {
+					w.Header().Add(k, fmt.Sprintf("%d", len(body)))
+				} else {
+					w.Header().Add(k, v)
+				}
 			}
 		}
-
 		w.WriteHeader(res.StatusCode)
-
-		body, _ := io.ReadAll(res.Body)
 		w.Write(body)
 	})
 
