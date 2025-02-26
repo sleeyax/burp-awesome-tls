@@ -9,14 +9,12 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
-
-	http "github.com/ooni/oohttp"
-	"github.com/open-ch/ja3"
 )
 
 const (
@@ -29,7 +27,7 @@ type interceptProxy struct {
 	burpClient      *http.Client
 	burpAddr        string
 	mutex           sync.RWMutex
-	clientHelloData map[string]string
+	clientHelloData string
 	listener        net.Listener
 	ctx             context.Context
 	cancel          context.CancelFunc
@@ -56,20 +54,19 @@ func newInterceptProxy(interceptAddr, burpAddr string) (*interceptProxy, error) 
 		burpClient: &http.Client{
 			Transport: tr,
 		},
-		burpAddr:        burpAddr,
-		mutex:           sync.RWMutex{},
-		clientHelloData: map[string]string{},
-		listener:        l,
-		ctx:             ctx,
-		cancel:          cancel,
+		burpAddr: burpAddr,
+		mutex:    sync.RWMutex{},
+		listener: l,
+		ctx:      ctx,
+		cancel:   cancel,
 	}, nil
 }
 
-func (s *interceptProxy) getTLSFingerprint(sni string) string {
+func (s *interceptProxy) getTLSFingerprint() string {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
-	return s.clientHelloData[sni]
+	return s.clientHelloData
 }
 
 func (s *interceptProxy) Start() {
@@ -194,14 +191,8 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		readClientHello = true
 
-		j, err := ja3.ComputeJA3FromSegment(clientHello)
-		if err != nil {
-			s.writeError(err)
-			return
-		}
-
 		s.mutex.Lock()
-		s.clientHelloData[j.GetSNI()] = hex.EncodeToString(clientHello)
+		s.clientHelloData = hex.EncodeToString(clientHello)
 		s.mutex.Unlock()
 	}
 }

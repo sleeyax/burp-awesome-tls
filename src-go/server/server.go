@@ -2,24 +2,11 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
+	fhttp "github.com/bogdanfinn/fhttp"
+	utls "github.com/bogdanfinn/utls"
 	"io"
 	"net"
-	"strings"
-
-	"server/internal"
-
-	http "github.com/ooni/oohttp"
-)
-
-const (
-	// DefaultInterceptProxyAddress is the default intercept proxy listener address.
-	DefaultInterceptProxyAddress string = "127.0.0.1:8886"
-	// DefaultBurpProxyAddress is the default burp proxy listener address.
-	DefaultBurpProxyAddress string = "127.0.0.1:8080"
-	// DefaultSpoofProxyAddress is the default spoof proxy listener address.
-	DefaultSpoofProxyAddress string = "127.0.0.1:8887"
 )
 
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
@@ -28,37 +15,59 @@ const (
 const ConfigurationHeaderKey = "Awesometlsconfig"
 
 var (
-	s         *http.Server
+	s         *fhttp.Server
 	proxy     *interceptProxy
 	isProxyOn bool
 )
 
 func init() {
-	s = &http.Server{}
+	s = &fhttp.Server{}
 }
 
 func StartServer(addr string) error {
-	s = &http.Server{}
+	if addr == "" {
+		return fmt.Errorf("address must be provided")
+	}
+
+	s = &fhttp.Server{}
 
 	ca, private, err := NewCertificateAuthority()
 	if err != nil {
 		return fmt.Errorf("NewCertificateAuthority, err: %w", err)
 	}
 
-	m := http.NewServeMux()
-	m.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		http.EnableHeaderOrder(w)
-
+	m := fhttp.NewServeMux()
+	m.HandleFunc("/", func(w fhttp.ResponseWriter, req *fhttp.Request) {
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
 		req.Header.Del(ConfigurationHeaderKey)
 
-		config, err := internal.ParseRequestConfig(configHeader)
+		config, err := ParseTransportConfig(configHeader)
 		if err != nil {
 			writeError(w, err)
 			return
 		}
 
-		transport, err := internal.NewTransport(proxy.getTLSFingerprint)
+		if !isProxyOn && config.UseInterceptedFingerprint {
+			if err = StartProxy(config.InterceptProxyAddr, config.BurpAddr); err != nil {
+				writeError(w, err)
+				return
+			}
+			isProxyOn = true
+		} else if isProxyOn && !config.UseInterceptedFingerprint {
+			if err = StopProxy(); err != nil {
+				writeError(w, err)
+				return
+			}
+			isProxyOn = false
+		}
+
+		if proxy != nil {
+			if interceptedFingerprint := proxy.getTLSFingerprint(); interceptedFingerprint != "" && config.UseInterceptedFingerprint {
+				config.HexClientHello = HexClientHello(interceptedFingerprint)
+			}
+		}
+
+		client, err := NewClient(config)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -66,14 +75,13 @@ func StartServer(addr string) error {
 
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
-		if strings.HasPrefix(string(internal.DefaultConfig.Fingerprint), "Chrome") {
-			pHeaderOrder := []string{":method", ":authority", ":scheme", ":path"}
-			for _, pHeader := range pHeaderOrder {
-				req.Header.Add(http.PHeaderOrderKey, pHeader)
-			}
-		}
+		req.RequestURI = ""
+		req.Header[fhttp.HeaderOrderKey] = config.HeaderOrder
+		// The content-length header is already set by the client (internally).
+		// Leaving it here causes strange '400 bad request' errors from the destination, so we remove it.
+		req.Header.Del("Content-Length")
 
-		res, err := transport.RoundTrip(req)
+		res, err := client.Do(req)
 		if err != nil {
 			writeError(w, err)
 			return
@@ -81,31 +89,40 @@ func StartServer(addr string) error {
 
 		defer res.Body.Close()
 
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
 		// Write the response (back to burp).
 		for k := range res.Header {
 			vv := res.Header.Values(k)
 			for _, v := range vv {
-				w.Header().Add(k, v)
+				// The response body is already automatically decompressed, so we need to update the Content-Length header accordingly.
+				// Not doing so will cause the response writer to return an error.
+				if k == "Content-Length" {
+					w.Header().Add(k, fmt.Sprintf("%d", len(body)))
+				} else {
+					w.Header().Add(k, v)
+				}
 			}
 		}
-
 		w.WriteHeader(res.StatusCode)
-
-		body, _ := io.ReadAll(res.Body)
 		w.Write(body)
 	})
 
 	s.Addr = addr
 	s.Handler = m
-	s.TLSConfig = &tls.Config{
-		Certificates: []tls.Certificate{
+	s.TLSConfig = &utls.Config{
+		Certificates: []utls.Certificate{
 			{
 				Certificate: [][]byte{ca.Raw},
 				PrivateKey:  private,
 				Leaf:        ca,
 			},
 		},
-		NextProtos: []string{"http/1.1", "h2"},
+		NextProtos: []string{"http/1.1"},
 	}
 
 	listener, err := net.Listen("tcp", s.Addr)
@@ -113,34 +130,11 @@ func StartServer(addr string) error {
 		return fmt.Errorf("listen, err: %w", err)
 	}
 
-	tlsListener := tls.NewListener(listener, s.TLSConfig)
+	tlsListener := utls.NewListener(listener, s.TLSConfig)
 
 	if err := s.Serve(tlsListener); err != nil {
 		return fmt.Errorf("serve, err: %w", err)
 	}
-
-	return nil
-}
-
-func SaveSettings(configJson string) error {
-	config, err := internal.ParseTransportConfig(configJson)
-	if err != nil {
-		return err
-	}
-
-	if !isProxyOn && config.UseInterceptedFingerprint {
-		if err = StartProxy(config.InterceptProxyAddr, config.BurpAddr); err != nil {
-			return err
-		}
-		isProxyOn = true
-	} else if isProxyOn && !config.UseInterceptedFingerprint {
-		if err = StopProxy(); err != nil {
-			return err
-		}
-		isProxyOn = false
-	}
-
-	internal.DefaultConfig = *config
 
 	return nil
 }
@@ -169,7 +163,7 @@ func StopServer() error {
 	return s.Shutdown(context.Background())
 }
 
-func writeError(w http.ResponseWriter, err error) {
+func writeError(w fhttp.ResponseWriter, err error) {
 	w.WriteHeader(500)
 	fmt.Fprint(w, fmt.Errorf("Awesome TLS error: %s", err))
 	fmt.Println(err)
