@@ -70,6 +70,7 @@ func StartServer(addr string) error {
 		req.URL.Host = config.Host
 		req.URL.Scheme = config.Scheme
 		req.RequestURI = ""
+		req.Header[fhttp.HeaderOrderKey] = config.HeaderOrder
 
 		res, err := client.Do(req)
 		if err != nil {

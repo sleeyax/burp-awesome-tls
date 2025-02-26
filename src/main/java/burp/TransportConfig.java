@@ -19,6 +19,7 @@ public class TransportConfig {
      * Intercept ClientHello Proxy Address.
      */
     public String InterceptProxyAddr;
+
     /**
      * Burp Proxy Address.
      */
@@ -40,9 +41,12 @@ public class TransportConfig {
     public Boolean UseInterceptedFingerprint;
 
     /**
-     * The maximum amount of time a dial will wait for a connect to complete.
-     * Defaults to [DefaultHttpTimeout].
+     * The maximum amount of time to wait for an HTTP response.
      */
     public int HttpTimeout;
-}
 
+    /**
+     * the order of headers to be sent in the request.
+     */
+    public String[] HeaderOrder;
+}

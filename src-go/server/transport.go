@@ -36,6 +36,9 @@ type TransportConfig struct {
 
 	// UseInterceptedFingerprint use intercepted fingerprint
 	UseInterceptedFingerprint bool
+
+	// HeaderOrder is the order of headers to be sent in the request.
+	HeaderOrder []string
 }
 
 func ParseTransportConfig(data string) (*TransportConfig, error) {

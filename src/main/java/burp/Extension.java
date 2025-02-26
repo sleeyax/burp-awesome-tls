@@ -68,9 +68,16 @@ public class Extension implements BurpExtension {
     private ProxyRequestToBeSentAction processHttpRequest(InterceptedRequest request) {
         try {
             var requestURL = new URL(request.url());
+
+            var headerOrder = new String[request.headers().size()];
+            for (var i = 0; i < request.headers().size(); i++) {
+                headerOrder[i] = request.headers().get(i).name();
+            }
+
             var transportConfig = settings.toTransportConfig();
             transportConfig.Host = requestURL.getHost();
             transportConfig.Scheme = requestURL.getProtocol();
+            transportConfig.HeaderOrder = headerOrder;
 
             var goConfigJSON = gson.toJson(transportConfig);
             var url = new URL("https://" + settings.getSpoofProxyAddress());
