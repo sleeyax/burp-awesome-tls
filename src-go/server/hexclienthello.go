@@ -26,5 +26,15 @@ func (hexClientHello HexClientHello) ToClientHelloSpec() (utls.ClientHelloSpec, 
 		return utls.ClientHelloSpec{}, err
 	}
 
+	for i, extension := range spec.Extensions {
+		// Replace ECH extension with a GREASE ECH extension.
+		// Real ECH is not supported yet.
+		if genericExtension, ok := extension.(*utls.GenericExtension); ok {
+			if genericExtension.Id == utls.ExtensionECH {
+				spec.Extensions[i] = utls.BoringGREASEECH()
+			}
+		}
+	}
+
 	return *spec, nil
 }
