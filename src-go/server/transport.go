@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bogdanfinn/fhttp/http2"
 	tls_client "github.com/bogdanfinn/tls-client"
 	"github.com/bogdanfinn/tls-client/profiles"
 	utls "github.com/bogdanfinn/utls"
@@ -80,21 +79,26 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 	}
 
 	if config.HexClientHello != "" {
+		customClientHelloSpec, err := config.HexClientHello.ToClientHelloSpec()
+		if err != nil {
+			return nil, err
+		}
+
 		customClientHelloID := utls.ClientHelloID{
-			Client:  "Custom",
+			Client:  "CustomFromHex",
 			Version: "1",
 			SpecFactory: func() (utls.ClientHelloSpec, error) {
-				return config.HexClientHello.ToClientHelloSpec()
+				return customClientHelloSpec, nil
 			},
 		}
 
 		customClientProfile := profiles.NewClientProfile(
 			customClientHelloID,
-			make(map[http2.SettingID]uint32),
-			make([]http2.SettingID, 0),
-			make([]string, 0),
+			nil,
+			nil,
+			nil,
 			0,
-			make([]http2.Priority, 0),
+			nil,
 			nil,
 		)
 
