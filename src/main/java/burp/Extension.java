@@ -3,7 +3,10 @@ package burp;
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.HttpService;
-import burp.api.montoya.proxy.http.*;
+import burp.api.montoya.proxy.http.InterceptedRequest;
+import burp.api.montoya.proxy.http.ProxyRequestHandler;
+import burp.api.montoya.proxy.http.ProxyRequestReceivedAction;
+import burp.api.montoya.proxy.http.ProxyRequestToBeSentAction;
 import com.google.gson.Gson;
 
 import java.net.URL;
@@ -42,17 +45,6 @@ public class Extension implements BurpExtension {
                 return ProxyRequestReceivedAction.continueWith(interceptedRequest);
             }
         });
-        api.proxy().registerResponseHandler(new ProxyResponseHandler() {
-            @Override
-            public ProxyResponseToBeSentAction handleResponseToBeSent(InterceptedResponse interceptedResponse) {
-                return processHttpResponse(interceptedResponse);
-            }
-
-            @Override
-            public ProxyResponseReceivedAction handleResponseReceived(InterceptedResponse interceptedResponse) {
-                return ProxyResponseReceivedAction.continueWith(interceptedResponse);
-            }
-        });
 
         new Thread(() -> {
             var err = ServerLibrary.INSTANCE.StartServer(settings.getSpoofProxyAddress());
@@ -69,6 +61,10 @@ public class Extension implements BurpExtension {
     private ProxyRequestToBeSentAction processHttpRequest(InterceptedRequest request) {
         try {
             var requestURL = new URL(request.url());
+
+            if (requestURL.getHost().equals("awesome-tls-error")) {
+                throw new Error(new String(request.body().getBytes(), StandardCharsets.UTF_8));
+            }
 
             var headerOrder = new String[request.headers().size()];
             for (var i = 0; i < request.headers().size(); i++) {
@@ -90,13 +86,5 @@ public class Extension implements BurpExtension {
             api.logging().logToError("Http request error: " + e);
             return null;
         }
-    }
-
-    private ProxyResponseToBeSentAction processHttpResponse(InterceptedResponse proxyMessage) {
-        if (proxyMessage.request().httpService().host().equals("awesome-tls-error")) {
-            api.logging().logToError("Http response error: " + new String(proxyMessage.body().getBytes(), StandardCharsets.UTF_8));
-        }
-
-        return ProxyResponseToBeSentAction.continueWith(proxyMessage);
     }
 }
