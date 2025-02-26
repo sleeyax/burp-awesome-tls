@@ -1,12 +1,12 @@
 package burp;
 
 import burp.api.montoya.MontoyaApi;
-import burp.api.montoya.persistence.PersistedObject;
+import burp.api.montoya.persistence.Preferences;
 
 import java.util.Objects;
 
 public class Settings {
-    private final PersistedObject storage;
+    private final Preferences storage;
 
     private final String spoofProxyAddress = "SpoofProxyAddress";
     private final String interceptProxyAddress = "InterceptProxyAddress";
@@ -23,7 +23,7 @@ public class Settings {
     public static final String DEFAULT_TLS_FINGERPRINT = "default";
 
     public Settings(MontoyaApi api) {
-        this.storage = api.persistence().extensionData();
+        this.storage = api.persistence().preferences();
         this.setDefaults();
     }
 
