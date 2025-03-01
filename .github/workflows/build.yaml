@@ -1,0 +1,34 @@
+# To test this workflow locally, run the following command:
+# act --use-gitignore=false
+name: Build
+
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: Build Go library
+        working-directory: ./src-go/server
+        run: |
+          go build -o ../../src/main/resources/linux-x86-64/server.so -buildmode=c-shared ./cmd/main.go
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Build with Gradle
+        run: ./gradlew buildJar
+      - name: List binaries
+        run: |
+          ls -lh ./src/main/resources/linux-x86-64/server.so
+          ls -lh ./build/libs/*.jar
