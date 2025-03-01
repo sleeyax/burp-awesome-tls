@@ -7,12 +7,12 @@ repositories {
 dependencies {
     compileOnly "net.portswigger.burp.extensions:montoya-api:2025.2"
     implementation 'net.java.dev.jna:jna:5.16.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.12.1'
     implementation 'com.intellij:forms_rt:7.0.3'
 }
 
 task buildJar(type: Jar) {
-    // duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
