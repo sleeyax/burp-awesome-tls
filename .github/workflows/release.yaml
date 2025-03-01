@@ -28,7 +28,7 @@ jobs:
           buildmode: c-shared
           working_dir: ./src-go/server
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'adopt'
