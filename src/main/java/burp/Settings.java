@@ -3,8 +3,6 @@ package burp;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.persistence.Preferences;
 
-import java.util.Objects;
-
 public class Settings {
     private final Preferences storage;
 
@@ -19,46 +17,55 @@ public class Settings {
     public static final String DEFAULT_SPOOF_PROXY_ADDRESS = "127.0.0.1:8887";
     public static final String DEFAULT_INTERCEPT_PROXY_ADDRESS = "127.0.0.1:8886";
     public static final String DEFAULT_BURP_PROXY_ADDRESS = "127.0.0.1:8080";
-    public static final String DEFAULT_HTTP_TIMEOUT = "30";
+    public static final Integer DEFAULT_HTTP_TIMEOUT = 30;
     public static final String DEFAULT_TLS_FINGERPRINT = "default";
+    public static final Boolean USE_INTERCEPTED_FINGERPRINT = false;
 
     public Settings(MontoyaApi api) {
         this.storage = api.persistence().preferences();
-        this.setDefaults();
     }
 
-    private void setDefaults() {
-        if (Objects.equals(this.read(this.spoofProxyAddress), "") || this.read(this.spoofProxyAddress) == null) {
-            this.write(this.spoofProxyAddress, DEFAULT_SPOOF_PROXY_ADDRESS);
+    public String read(String key, String defaultValue) {
+        var value = this.storage.getString(key);
+        if (value == null || value.isEmpty()) {
+            this.write(key, defaultValue);
+            return defaultValue;
         }
-
-        if (Objects.equals(this.read(this.interceptProxyAddress), "") || this.read(this.interceptProxyAddress) == null) {
-            this.write(this.interceptProxyAddress, DEFAULT_INTERCEPT_PROXY_ADDRESS);
-        }
-
-        if (Objects.equals(this.read(this.burpProxyAddress), "") || this.read(this.burpProxyAddress) == null) {
-            this.write(this.burpProxyAddress, DEFAULT_BURP_PROXY_ADDRESS);
-        }
-
-        if (this.read(this.fingerprint) == null) {
-            this.write(this.fingerprint, DEFAULT_TLS_FINGERPRINT);
-        }
-
-        if (this.read(this.httpTimeout) == null) {
-            this.write(this.httpTimeout, DEFAULT_HTTP_TIMEOUT);
-        }
+        return value;
     }
 
-    public String read(String key) {
-        return this.storage.getString(key);
+    public Boolean read(String key, Boolean defaultValue) {
+        var value = this.storage.getBoolean(key);
+        if (value == null) {
+            this.storage.setBoolean(key, defaultValue);
+            return defaultValue;
+        }
+        return value;
+    }
+
+    public Integer read(String key, Integer defaultValue) {
+        var value = this.storage.getInteger(key);
+        if (value == null) {
+            this.storage.setInteger(key, defaultValue);
+            return defaultValue;
+        }
+        return value;
     }
 
     public void write(String key, String value) {
         this.storage.setString(key, value);
     }
 
+    public void write(String key, Boolean value) {
+        this.storage.setBoolean(key, value);
+    }
+
+    public void write(String key, Integer value) {
+        this.storage.setInteger(key, value);
+    }
+
     public String getSpoofProxyAddress() {
-        return this.read(this.spoofProxyAddress);
+        return this.read(this.spoofProxyAddress, DEFAULT_SPOOF_PROXY_ADDRESS);
     }
 
     public void setSpoofProxyAddress(String spoofProxyAddress) {
@@ -66,7 +73,7 @@ public class Settings {
     }
 
     public String getInterceptProxyAddress() {
-        return this.read(this.interceptProxyAddress);
+        return this.read(this.interceptProxyAddress, DEFAULT_INTERCEPT_PROXY_ADDRESS);
     }
 
     public void setInterceptProxyAddress(String interceptProxyAddress) {
@@ -74,7 +81,7 @@ public class Settings {
     }
 
     public String getBurpProxyAddress() {
-        return this.read(this.burpProxyAddress);
+        return this.read(this.burpProxyAddress, DEFAULT_BURP_PROXY_ADDRESS);
     }
 
     public void setBurpProxyAddress(String burpProxyAddress) {
@@ -82,23 +89,23 @@ public class Settings {
     }
 
     public Boolean getUseInterceptedFingerprint() {
-        return Boolean.parseBoolean(this.read(this.useInterceptedFingerprint));
+        return this.read(this.useInterceptedFingerprint, USE_INTERCEPTED_FINGERPRINT);
     }
 
     public void setUseInterceptedFingerprint(Boolean useInterceptedFingerprint) {
-        this.write(this.useInterceptedFingerprint, String.valueOf(useInterceptedFingerprint));
+        this.write(this.useInterceptedFingerprint, useInterceptedFingerprint);
     }
 
     public int getHttpTimeout() {
-        return Integer.parseInt(this.read(this.httpTimeout));
+        return this.read(this.httpTimeout, DEFAULT_HTTP_TIMEOUT);
     }
 
-    public void setHttpTimeout(int httpTimeout) {
-        this.write(this.httpTimeout, String.valueOf(httpTimeout));
+    public void setHttpTimeout(Integer httpTimeout) {
+        this.write(this.httpTimeout, httpTimeout);
     }
 
     public String getFingerprint() {
-        return this.read(this.fingerprint);
+        return this.read(this.fingerprint, DEFAULT_TLS_FINGERPRINT);
     }
 
     public void setFingerprint(String fingerprint) {
@@ -106,7 +113,7 @@ public class Settings {
     }
 
     public String getHexClientHello() {
-        return this.read(this.hexClientHello);
+        return this.read(this.hexClientHello, "");
     }
 
     public void setHexClientHello(String hexClientHello) {
