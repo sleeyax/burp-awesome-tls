@@ -11,23 +11,34 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"path"
 	"sync/atomic"
 	"time"
 )
 
 // Based on: https://github.com/ulixee/hero/blob/main/mitm-socket/go/generate_cert.go
 
-var (
-	caFile    string = "ca.der"
-	caKeyFile string = "caKey.der"
+const (
+	caFile    = "ca.der"
+	caKeyFile = "caKey.der"
 )
 
 // While generating a new certificate, in order to get a unique serial
 // number every time we increment this value.
-var currentSerialNumber int64 = time.Now().Unix()
+var currentSerialNumber = time.Now().Unix()
+
+func getAbsoluteFilePath(file string) string {
+	if userConfigDir, err := os.UserConfigDir(); err == nil {
+		configDir := path.Join(userConfigDir, "burp-awesome-tls")
+		_ = os.Mkdir(configDir, 0o700)
+		return path.Join(configDir, file)
+	}
+
+	return file
+}
 
 func readCertFromDisk(file string) (*x509.Certificate, error) {
-	bytes, err := os.ReadFile(file)
+	bytes, err := os.ReadFile(getAbsoluteFilePath(file))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +52,7 @@ func readCertFromDisk(file string) (*x509.Certificate, error) {
 }
 
 func readPrivateKeyFromDisk(file string) (*rsa.PrivateKey, error) {
-	bytes, err := os.ReadFile(file)
+	bytes, err := os.ReadFile(getAbsoluteFilePath(file))
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +129,7 @@ func NewCertificateAuthority() (*x509.Certificate, *rsa.PrivateKey, error) {
 		return nil, nil, err
 	}
 
-	err = os.WriteFile(caFile, raw, 0o600)
+	err = os.WriteFile(getAbsoluteFilePath(caFile), raw, 0o600)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -128,7 +139,7 @@ func NewCertificateAuthority() (*x509.Certificate, *rsa.PrivateKey, error) {
 		return nil, nil, err
 	}
 
-	err = os.WriteFile(caKeyFile, privBytes, 0o600)
+	err = os.WriteFile(getAbsoluteFilePath(caKeyFile), privBytes, 0o600)
 	if err != nil {
 		return nil, nil, err
 	}
