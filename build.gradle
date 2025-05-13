@@ -5,7 +5,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "net.portswigger.burp.extensions:montoya-api:2025.4"
+    compileOnly "net.portswigger.burp.extensions:montoya-api:2025.5"
     implementation 'net.java.dev.jna:jna:5.17.0'
     implementation 'com.google.code.gson:gson:2.13.1'
     implementation 'com.intellij:forms_rt:7.0.3'
