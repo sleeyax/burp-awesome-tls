@@ -6,6 +6,8 @@ github.com/bogdanfinn/fhttp v0.5.36 h1:t1sO/EkO4K40QD/Ti8f6t80leZIdh2AaeLfN7dMvj
 github.com/bogdanfinn/fhttp v0.5.36/go.mod h1:BlcawVfXJ4uhk5yyNGOOY2bwo8UmMi6ccMszP1KGLkU=
 github.com/bogdanfinn/tls-client v1.8.0 h1:IB44SqKa0XKdx3GYXpRbkqN3+tsBtg9RJYRsl36boOA=
 github.com/bogdanfinn/tls-client v1.8.0/go.mod h1:ehNITC7JBFeh6S7QNWtfD+PBKm0RsqvizAyyij2d/6g=
+github.com/bogdanfinn/tls-client v1.9.2 h1:psWYG8q/5/8Y38lMwKRel1bzLR+d/IKrTC4jt3mSRlE=
+github.com/bogdanfinn/tls-client v1.9.2/go.mod h1:ehNITC7JBFeh6S7QNWtfD+PBKm0RsqvizAyyij2d/6g=
 github.com/bogdanfinn/utls v1.6.5 h1:rVMQvhyN3zodLxKFWMRLt19INGBCZ/OM2/vBWPNIt1w=
 github.com/bogdanfinn/utls v1.6.5/go.mod h1:czcHxHGsc1q9NjgWSeSinQZzn6MR76zUmGVIGanSXO0=
 github.com/cloudflare/circl v1.5.0 h1:hxIWksrX6XN5a1L2TI/h53AGPhNHoUBo+TD1ms9+pys=
