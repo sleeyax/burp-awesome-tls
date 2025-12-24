@@ -12,6 +12,12 @@ public interface ServerLibrary extends Library {
     String StopServer();
 
     String GetFingerprints();
+    
+    interface LogCallback extends com.sun.jna.Callback {
+        void invoke(String msg);
+    }
+    
+    void SetLogger(LogCallback callback);
 
     void SmokeTest();
 }

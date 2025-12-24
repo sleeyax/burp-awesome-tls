@@ -17,6 +17,7 @@ public class Extension implements BurpExtension {
     private MontoyaApi api;
     private Gson gson;
     private Settings settings;
+    private ServerLibrary.LogCallback logCallback;
 
     private static final String HEADER_KEY = "Awesometlsconfig";
 
@@ -25,6 +26,10 @@ public class Extension implements BurpExtension {
         this.api = api;
         this.gson = new Gson();
         this.settings = new Settings(api);
+
+        this.logCallback = msg -> api.logging().logToOutput("[Go Server] " + msg);
+        ServerLibrary.INSTANCE.SetLogger(this.logCallback);
+        api.logging().logToOutput("Awesome TLS Extension initialized.");
 
         api.extension().setName("Awesome TLS");
         api.extension().registerUnloadingHandler(() -> {

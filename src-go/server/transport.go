@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+
 	tls_client "github.com/bogdanfinn/tls-client"
 	"github.com/bogdanfinn/tls-client/profiles"
 	utls "github.com/bogdanfinn/utls"
-	"strings"
 )
 
 type TransportConfig struct {
@@ -38,6 +39,9 @@ type TransportConfig struct {
 
 	// HeaderOrder is the order of headers to be sent in the request.
 	HeaderOrder []string
+
+	// Debug enables verbose logging for the request
+	Debug bool
 }
 
 func ParseTransportConfig(data string) (*TransportConfig, error) {

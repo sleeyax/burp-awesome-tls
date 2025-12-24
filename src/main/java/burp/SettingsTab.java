@@ -26,7 +26,9 @@ public class SettingsTab {
     private JPanel panelAdvanced;
     private JButton buttonSaveAdvanced;
     private JLabel labelHexClientHello;
+
     private JTextField textFieldHexClientHello;
+    private JCheckBox checkBoxDebug;
 
     public SettingsTab(Settings settings) {
         textFieldInterceptProxyAddress.setText(settings.getInterceptProxyAddress());
@@ -35,6 +37,8 @@ public class SettingsTab {
         textFieldHexClientHello.setText(settings.getHexClientHello());
         spinnerHttpTimout.setValue(settings.getHttpTimeout());
         checkBoxButtonUseInterceptedFingerprint.setSelected(settings.getUseInterceptedFingerprint());
+        checkBoxDebug.setSelected(settings.getDebug());
+
         for (var item : settings.getFingerprints()) {
             comboBoxFingerprint.addItem(item);
         }
@@ -45,6 +49,7 @@ public class SettingsTab {
             settings.setFingerprint((String) comboBoxFingerprint.getSelectedItem());
             settings.setHexClientHello(textFieldHexClientHello.getText());
             settings.setHttpTimeout((int) spinnerHttpTimout.getValue());
+            settings.setDebug(checkBoxDebug.isSelected());
         });
 
         buttonSaveAdvanced.addActionListener(e -> {
@@ -78,7 +83,7 @@ public class SettingsTab {
         tabbedPaneTab = new JTabbedPane();
         panelMain.add(tabbedPaneTab, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         panelSettings = new JPanel();
-        panelSettings.setLayout(new GridLayoutManager(10, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelSettings.setLayout(new GridLayoutManager(11, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPaneTab.addTab("settings", panelSettings);
         labelSpoofProxyAddress = new JLabel();
         labelSpoofProxyAddress.setRequestFocusEnabled(false);
@@ -103,9 +108,13 @@ public class SettingsTab {
         spinnerHttpTimout = new JSpinner();
         spinnerHttpTimout.setToolTipText("The maximum amount of time a dial will wait for a connect to complete.");
         panelSettings.add(spinnerHttpTimout, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        checkBoxDebug = new JCheckBox();
+        checkBoxDebug.setText("Enable Server Logging");
+        checkBoxDebug.setToolTipText("Enable verbose logging from the Go server.");
+        panelSettings.add(checkBoxDebug, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelSettings.add(panel1, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panelSettings.add(panel1, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         labelHexClientHello = new JLabel();
         labelHexClientHello.setRequestFocusEnabled(false);
         labelHexClientHello.setText("Hex Client Hello:");
@@ -117,7 +126,7 @@ public class SettingsTab {
         panelSettings.add(textFieldHexClientHello, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         buttonSave = new JButton();
         buttonSave.setText("Save all settings");
-        panelSettings.add(buttonSave, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panelSettings.add(buttonSave, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         panelAdvanced = new JPanel();
         panelAdvanced.setLayout(new GridLayoutManager(7, 1, new Insets(0, 0, 0, 0), -1, -1));
         panelAdvanced.setToolTipText("");

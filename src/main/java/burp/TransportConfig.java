@@ -48,5 +48,13 @@ public class TransportConfig {
     /**
      * the order of headers to be sent in the request.
      */
+    /**
+     * the order of headers to be sent in the request.
+     */
     public String[] HeaderOrder;
+
+    /**
+     * Enable verbose server logging.
+     */
+    public boolean Debug;
 }

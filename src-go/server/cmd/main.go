@@ -1,5 +1,14 @@
 package main
 
+/*
+#include <stdlib.h>
+typedef void (*LogCallback)(char*);
+static void call_log_callback(LogCallback cb, char* msg) {
+    if (cb) {
+        cb(msg);
+    }
+}
+*/
 import "C"
 
 import (
@@ -8,6 +17,7 @@ import (
 	"log"
 	"server"
 	"strings"
+	"unsafe"
 )
 
 func main() {
@@ -41,4 +51,18 @@ func SmokeTest() {
 //export GetFingerprints
 func GetFingerprints() *C.char {
 	return C.CString(strings.Join(server.GetFingerprints(), "\n"))
+}
+
+var logCallback C.LogCallback
+
+//export SetLogger
+func SetLogger(cb C.LogCallback) {
+	logCallback = cb
+	server.Logger = func(msg string) {
+		if logCallback != nil {
+			cMsg := C.CString(msg)
+			defer C.free(unsafe.Pointer(cMsg))
+			C.call_log_callback(logCallback, cMsg)
+		}
+	}
 }

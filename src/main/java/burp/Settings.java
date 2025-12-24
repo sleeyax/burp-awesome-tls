@@ -13,6 +13,7 @@ public class Settings {
     private final String hexClientHello = "HexClientHello";
     private final String useInterceptedFingerprint = "UseInterceptedFingerprint";
     private final String httpTimeout = "HttpTimeout";
+    private final String debug = "Debug";
 
     public static final String DEFAULT_SPOOF_PROXY_ADDRESS = "127.0.0.1:8887";
     public static final String DEFAULT_INTERCEPT_PROXY_ADDRESS = "127.0.0.1:8886";
@@ -20,6 +21,7 @@ public class Settings {
     public static final Integer DEFAULT_HTTP_TIMEOUT = 30;
     public static final String DEFAULT_TLS_FINGERPRINT = "default";
     public static final Boolean USE_INTERCEPTED_FINGERPRINT = false;
+    public static final Boolean DEFAULT_DEBUG = false;
 
     public Settings(MontoyaApi api) {
         this.storage = api.persistence().preferences();
@@ -62,6 +64,14 @@ public class Settings {
 
     public void write(String key, Integer value) {
         this.storage.setInteger(key, value);
+    }
+
+    public Boolean getDebug() {
+        return this.read(this.debug, DEFAULT_DEBUG);
+    }
+
+    public void setDebug(Boolean debug) {
+        this.write(this.debug, debug);
     }
 
     public String getSpoofProxyAddress() {
@@ -132,6 +142,7 @@ public class Settings {
         transportConfig.UseInterceptedFingerprint = this.getUseInterceptedFingerprint();
         transportConfig.BurpAddr = this.getBurpProxyAddress();
         transportConfig.InterceptProxyAddr = this.getInterceptProxyAddress();
+        transportConfig.Debug = this.getDebug();
         return transportConfig;
     }
 }

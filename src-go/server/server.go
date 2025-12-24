@@ -1,12 +1,16 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	fhttp "github.com/bogdanfinn/fhttp"
-	utls "github.com/bogdanfinn/utls"
 	"io"
 	"net"
+	"strings"
+
+	fhttp "github.com/bogdanfinn/fhttp"
+	utls "github.com/bogdanfinn/utls"
+	"github.com/klauspost/compress/zstd"
 )
 
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.
@@ -28,6 +32,8 @@ func StartServer(addr string) error {
 	if addr == "" {
 		return fmt.Errorf("address must be provided")
 	}
+
+	logMsg(fmt.Sprintf("Go server starting on %s...", addr))
 
 	s = &fhttp.Server{}
 
@@ -83,16 +89,88 @@ func StartServer(addr string) error {
 
 		res, err := client.Do(req)
 		if err != nil {
-			writeError(w, err)
-			return
+			if strings.Contains(err.Error(), "http: server gave HTTP response to HTTPS client") {
+				logMsg("Warning: HTTPS handshake failed because server returned HTTP. Retrying with HTTP scheme...")
+				req.URL.Scheme = "http"
+				res, err = client.Do(req)
+				if err != nil {
+					writeError(w, err)
+					return
+				}
+			} else {
+				writeError(w, err)
+				return
+			}
 		}
 
 		defer res.Body.Close()
 
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			writeError(w, err)
+		if config.Debug {
+			logMsg(fmt.Sprintf("Request URL: %s", req.URL.String()))
+			logMsg(fmt.Sprintf("Response Status: %s", res.Status))
+
+			var headersBuilder strings.Builder
+			headersBuilder.WriteString("Response Headers: ")
+			for k, v := range res.Header {
+				headersBuilder.WriteString(fmt.Sprintf("[%s: %s] ", k, strings.Join(v, ", ")))
+			}
+			logMsg(headersBuilder.String())
+		}
+
+		var body []byte
+		var errRead error
+
+		// If tls-client already decompressed it (Uncompressed=true) or if headers say zstd
+		useZstd := strings.EqualFold(res.Header.Get("Content-Encoding"), "zstd") && !res.Uncompressed
+
+		if useZstd {
+			// Read all compressed bytes first to allow fallback
+			compressedBytes, err := io.ReadAll(res.Body)
+			if err != nil {
+				writeError(w, err)
+				return
+			}
+
+			// Try to decompress
+			decoder, err := zstd.NewReader(bytes.NewReader(compressedBytes))
+			if err == nil {
+				body, errRead = io.ReadAll(decoder)
+				decoder.Close()
+			}
+
+			if err != nil || errRead != nil {
+				// If decompression failed, assume it might be already decompressed or invalid.
+				// Log the warning but return the original bytes.
+				logMsg(fmt.Sprintf("Warning: zstd decompression failed (magic: %x...), assuming already decompressed. Error: %v %v",
+					safePeek(compressedBytes, 4), err, errRead))
+				body = compressedBytes
+			}
+
+			// Always remove the header if we processed it (successfully or fallback)
+			// to avoid browser errors if we are returning plaintext.
+			res.Header.Del("Content-Encoding")
+		} else {
+			// Normal read
+			body, errRead = io.ReadAll(res.Body)
+			if errRead != nil {
+				writeError(w, errRead)
+				return
+			}
+
+			// If it was uncompressed by transport but header remains
+			if res.Uncompressed && strings.EqualFold(res.Header.Get("Content-Encoding"), "zstd") {
+				res.Header.Del("Content-Encoding")
+			}
+		}
+
+		if errRead != nil {
+			// specific read error not handled above
+			writeError(w, errRead)
 			return
+		}
+
+		if config.Debug {
+			logMsg(fmt.Sprintf("Read Body Size: %d", len(body)))
 		}
 
 		// Write the response (back to burp).
@@ -165,6 +243,24 @@ func StopServer() error {
 
 func writeError(w fhttp.ResponseWriter, err error) {
 	w.WriteHeader(500)
-	fmt.Fprint(w, fmt.Errorf("Awesome TLS error: %s", err))
-	fmt.Println(err)
+	fmt.Fprint(w, fmt.Sprintf("Awesome TLS error: %s", err))
+	logMsg(err.Error())
+}
+
+var Logger func(string)
+
+func logMsg(msg string) {
+	if Logger != nil {
+		Logger(msg)
+	} else {
+		fmt.Println(msg)
+
+	}
+}
+
+func safePeek(data []byte, length int) []byte {
+	if len(data) < length {
+		return data
+	}
+	return data[:length]
 }
