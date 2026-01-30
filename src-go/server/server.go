@@ -3,10 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
-	fhttp "github.com/bogdanfinn/fhttp"
-	utls "github.com/bogdanfinn/utls"
 	"io"
 	"net"
+
+	fhttp "github.com/bogdanfinn/fhttp"
+	utls "github.com/bogdanfinn/utls"
 )
 
 // ConfigurationHeaderKey is the name of the header field that contains the RoundTripper configuration.

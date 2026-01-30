@@ -49,4 +49,9 @@ public class TransportConfig {
      * the order of headers to be sent in the request.
      */
     public String[] HeaderOrder;
+
+    /**
+     * External proxy URL (format: `http://user:pass@host:port`).
+     */
+    public String ExternalProxyUrl;
 }
