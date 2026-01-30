@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+
 	tls_client "github.com/bogdanfinn/tls-client"
 	"github.com/bogdanfinn/tls-client/profiles"
 	utls "github.com/bogdanfinn/utls"
-	"strings"
 )
 
 type TransportConfig struct {
@@ -38,6 +39,9 @@ type TransportConfig struct {
 
 	// HeaderOrder is the order of headers to be sent in the request.
 	HeaderOrder []string
+
+	// ExternalProxyUrl is an optional upstream proxy (format: `http://user:pass@host:port`).
+	ExternalProxyUrl string
 }
 
 func ParseTransportConfig(data string) (*TransportConfig, error) {
@@ -62,6 +66,10 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 
 	if config.HttpTimeout != 0 {
 		options = append(options, tls_client.WithTimeoutSeconds(config.HttpTimeout))
+	}
+
+	if config.ExternalProxyUrl != "" {
+		options = append(options, tls_client.WithProxyUrl(config.ExternalProxyUrl))
 	}
 
 	// The order of precedence is:
@@ -91,6 +99,8 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 			defaultProfile.GetConnectionFlow(),
 			defaultProfile.GetPriorities(),
 			defaultProfile.GetHeaderPriority(),
+			defaultProfile.GetStreamID(),
+			defaultProfile.GetAllowHTTP(),
 		)
 
 		options = append(options, tls_client.WithClientProfile(customClientProfile))
