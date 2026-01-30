@@ -9,6 +9,7 @@ import burp.api.montoya.proxy.http.ProxyRequestReceivedAction;
 import burp.api.montoya.proxy.http.ProxyRequestToBeSentAction;
 import com.google.gson.Gson;
 
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -60,7 +61,7 @@ public class Extension implements BurpExtension {
 
     private ProxyRequestToBeSentAction processHttpRequest(InterceptedRequest request) {
         try {
-            var requestURL = new URL(request.url());
+            var requestURL = new URI(request.url()).toURL();
 
             if (requestURL.getHost().equals("awesome-tls-error")) {
                 throw new Error(new String(request.body().getBytes(), StandardCharsets.UTF_8));
@@ -77,7 +78,7 @@ public class Extension implements BurpExtension {
             transportConfig.HeaderOrder = headerOrder;
 
             var goConfigJSON = gson.toJson(transportConfig);
-            var url = new URL("https://" + settings.getSpoofProxyAddress());
+            var url = new URI("https://" + settings.getSpoofProxyAddress()).toURL();
             var httpService = HttpService.httpService(url.getHost(), url.getPort(), Objects.equals(url.getProtocol(), "https"));
             var nextRequest = request.withService(httpService).withAddedHeader(HEADER_KEY, goConfigJSON);
 
