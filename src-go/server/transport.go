@@ -101,6 +101,11 @@ func NewClient(config *TransportConfig) (tls_client.HttpClient, error) {
 			defaultProfile.GetHeaderPriority(),
 			defaultProfile.GetStreamID(),
 			defaultProfile.GetAllowHTTP(),
+			defaultProfile.GetHttp3Settings(),
+			defaultProfile.GetHttp3SettingsOrder(),
+			defaultProfile.GetHttp3PriorityParam(),
+			defaultProfile.GetHttp3PseudoHeaderOrder(),
+			defaultProfile.GetHttp3SendGreaseFrames(),
 		)
 
 		options = append(options, tls_client.WithClientProfile(customClientProfile))
