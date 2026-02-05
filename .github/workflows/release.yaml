@@ -7,11 +7,45 @@ on:
     tags:
       - 'v*'
 jobs:
+  build-macos:
+    name: Build macOS native libraries
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: Build macOS libraries
+        working-directory: ./src-go/server
+        run: |
+          # Build for Intel Macs (amd64)
+          mkdir -p build
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -buildmode=c-shared -ldflags="-w" -o build/server-darwin-amd64.dylib ./cmd
+          
+          # Build for Apple Silicon (arm64) 
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -buildmode=c-shared -ldflags="-w" -o build/server-darwin-arm64.dylib ./cmd
+          
+          # Verify files were created
+          ls -lh build/
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-libraries
+          path: ./src-go/server/build/server-darwin-*.dylib
+          retention-days: 1
+
   build:
     name: Build and release binaries
     runs-on: ubuntu-latest
+    needs: build-macos
     steps:
       - uses: actions/checkout@v6
+      - name: Download macOS libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-libraries
+          path: ./src-go/server/build/
       - name: Execute CGO builds using XGO
         uses: crazy-max/ghaction-xgo@v3
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
@@ -21,12 +55,26 @@ jobs:
           dest: build
           pkg: cmd
           prefix: server
-          targets: windows/386,windows/amd64,linux/386,linux/amd64,linux/arm,linux/arm64,darwin/amd64,darwin/arm64
+          targets: windows/386,windows/amd64,linux/386,linux/amd64,linux/arm,linux/arm64
           # Prints the build commands as compilation progresses (default false)
           x: true
           ldflags: -w
           buildmode: c-shared
           working_dir: ./src-go/server
+      - name: Verify all libraries exist
+        run: |
+          echo "Checking for required library files..."
+          ls -lh ./src-go/server/build/
+          # Check that all expected files exist
+          for file in server-darwin-amd64.dylib server-darwin-arm64.dylib \
+                      server-linux-386.so server-linux-amd64.so server-linux-arm-5.so server-linux-arm64.so \
+                      server-windows-386.dll server-windows-amd64.dll; do
+            if [ ! -f "./src-go/server/build/$file" ]; then
+              echo "ERROR: Missing library file: $file"
+              exit 1
+            fi
+            echo "✓ Found: $file"
+          done
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
