@@ -10,6 +10,8 @@ jobs:
   build-macos:
     name: Build macOS native libraries
     runs-on: macos-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
       - name: Set up Go
