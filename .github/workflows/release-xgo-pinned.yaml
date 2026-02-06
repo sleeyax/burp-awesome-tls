@@ -1,0 +1,46 @@
+# To test this workflow locally, run the following command:
+# act --use-gitignore=false
+name: Release binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    name: Build and release binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Execute CGO builds using XGO
+        uses: crazy-max/ghaction-xgo@v3
+        # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
+        with:
+          xgo_version: v0.36.0  # Pin to version before OSXCross 12.3 update (Sept 2025)
+          go_version: 1.21
+          dest: build
+          pkg: cmd
+          prefix: server
+          targets: windows/386,windows/amd64,linux/386,linux/amd64,linux/arm,linux/arm64,darwin/amd64,darwin/arm64
+          # Prints the build commands as compilation progresses (default false)
+          x: true
+          ldflags: -w
+          buildmode: c-shared
+          working_dir: ./src-go/server
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+      - name: Build cross-platform jar files
+        shell: sh
+        run: ./build.sh
+      - name: Upload binaries
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "./build/libs/*.jar"
+          tags: true

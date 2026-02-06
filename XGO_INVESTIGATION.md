@@ -1,126 +1,114 @@
 # XGO Darwin Build Investigation
 
 ## Question
-Why doesn't XGO work for building macOS (darwin) libraries with `buildmode: c-shared`?
+Why doesn't XGO work for building macOS (darwin) libraries with `buildmode: c-shared` in v2.2.0, when it worked fine in v2.1.0?
 
-## Investigation Process
+## Investigation Timeline
 
-### Test Setup
-Ran XGO locally with the exact configuration from the release workflow:
-```bash
-docker run --rm \
-  -v "$PWD:/source" \
-  -v "$PWD/build:/build" \
-  crazymax/xgo:latest \
-  -go 1.21 \
-  -out server \
-  -targets darwin/amd64,darwin/arm64 \
-  -buildmode c-shared \
-  -ldflags "-w" \
-  -x \
-  -pkg cmd \
-  /source
+### v2.1.0 (March 2025) - WORKING ✓
+- Go version: 1.22.0 (toolchain 1.24.0)
+- XGO version: `latest` (commit 866cd0b, before Sept 2025 changes)
+- JAR contents: `darwin-aarch64/libserver.dylib` (10.5 MB) ✓
+- OSXCross version in XGO: 11.3
+
+### v2.2.0 (January 2026) - BROKEN ✗
+- Go version: 1.24.1 (toolchain 1.25.6)
+- XGO version: `latest` (includes Sept 2025 changes)
+- JAR contents: Empty `darwin-aarch64/` directory ✗
+- OSXCross version in XGO: 12.3
+
+## Root Cause Discovery
+
+### XGO Change Log Analysis
+Between v2.1.0 and v2.2.0, XGO made critical changes:
+
+**September 14, 2025 - Commit e139f61:**
+```diff
+-ARG OSXCROSS_VERSION="11.3"
++ARG OSXCROSS_VERSION="12.3"
 ```
 
-## Findings
+This OSXCross update from 11.3 to 12.3 broke c-shared builds for darwin targets!
 
-### XGO DOES Generate Darwin Binaries!
+### Evidence
 
-XGO successfully compiles darwin binaries, but with **incorrect file names**:
+1. **Workflow unchanged**: `.github/workflows/release.yaml` had only minor action version bumps
+2. **build.sh unchanged**: Still expects `.dylib` files in both versions
+3. **XGO behavior changed**: After OSXCross 12.3 update, darwin builds produce:
+   - Wrong file names: `server-darwin-amd64` (no extension) instead of `server-darwin-amd64.dylib`
+   - Wrong file type: `ar archive` instead of Mach-O shared library
+   - buildmode flag not respected
 
-#### What XGO Creates:
-- `server-darwin-amd64` (NO extension)
-- `server-darwin-arm64` (NO extension)
-
-#### What build.sh Expects:
-- `server-darwin-amd64.dylib`
-- `server-darwin-arm64.dylib`
-
-### File Type Analysis
+### Local Testing Confirms
 ```bash
+$ docker run crazymax/xgo:latest -buildmode c-shared -targets darwin/amd64,darwin/arm64 ...
+# Produces:
+- server-darwin-amd64 (ar archive, 715KB)
+- server-darwin-arm64 (ar archive, 710KB)
+
 $ file build/server-darwin-*
 build/server-darwin-amd64: current ar archive
 build/server-darwin-arm64: current ar archive
 ```
 
-The files are **ar archives**, not proper shared libraries (.dylib files). This indicates XGO's `c-shared` buildmode isn't working correctly for darwin targets.
-
-### XGO Build Output
-From the logs, XGO executed:
-```
-Compiling for darwin/amd64...
-+ CC=o64-clang
-+ CXX=o64-clang++
-+ GOOS=darwin
-+ GOARCH=amd64
-+ CGO_ENABLED=1
-+ go build '--ldflags=  ' -o /build/server-darwin-amd64 ./
-
-Compiling for darwin/arm64...
-+ CC=o64-clang
-+ CXX=o64-clang++
-+ GOOS=darwin
-+ GOARCH=arm64
-+ CGO_ENABLED=1
-+ go build '--ldflags=  ' -o /build/server-darwin-arm64 ./
-```
-
-Notice: The `-buildmode c-shared` flag is **NOT** being passed to `go build`!
-
-## Root Cause
-
-XGO's `extension()` function (from `/usr/local/bin/xgo-build` in the container) should add `.dylib` for darwin with c-shared buildmode:
-
-```bash
-function extension {
-  # ...
-  elif [ "$FLAG_BUILDMODE" == "shared" ] || [ "$FLAG_BUILDMODE" == "c-shared" ]; then
-    if [ "$1" == "darwin" ]; then
-      echo ".dylib"
-    fi
-  fi
-}
-```
-
-However, the buildmode flag isn't being properly propagated through XGO's build system, causing:
-1. No extension added to filenames
-2. Wrong build type (ar archive instead of dylib)
-
 ## Solution Options
 
-### Option 1: Fix in Workflow (Post-Process)
-Add a step after XGO to rename/fix darwin files:
+### Option 1: Pin XGO to Pre-OSXCross-12.3 Version (MINIMAL FIX)
+**Pros:**
+- Minimal workflow change (one line)
+- Uses battle-tested XGO version that worked in v2.1.0
+- No additional complexity
+
+**Cons:**
+- Uses older XGO version
+- May miss newer Go versions/features
+- Still relies on XGO's darwin support
+
+**Implementation:**
 ```yaml
-- name: Fix darwin file extensions
-  run: |
-    cd ./src-go/server/build
-    if [ -f "server-darwin-amd64" ]; then
-      mv server-darwin-amd64 server-darwin-amd64.dylib
-    fi
-    if [ -f "server-darwin-arm64" ]; then
-      mv server-darwin-arm64 server-darwin-arm64.dylib
-    fi
+- name: Execute CGO builds using XGO
+  uses: crazy-max/ghaction-xgo@v3
+  with:
+    xgo_version: v0.24.0  # Pin to last working version (before Sept 2025)
+    # ... rest unchanged
 ```
 
-**Issue**: Files are still ar archives, not proper dylibs!
+### Option 2: Use Native macOS Runner (ALREADY IMPLEMENTED)
+**Pros:**
+- Produces proper dylib files
+- Uses native Go toolchain (100% correct)
+- Future-proof solution
 
-### Option 2: Use Native macOS Runner (RECOMMENDED)
-Compile darwin libraries natively on macOS runner where Go's c-shared buildmode works correctly:
+**Cons:**
+- More complex workflow
+- Requires two jobs instead of one
+- Additional macOS runner minutes
+
+### Option 3: Post-Process XGO Output
+**Pros:**
+- Keeps XGO for all platforms
+
+**Cons:**
+- Doesn't fix the ar archive issue
+- Fragile workaround
+- Files still wrong type
+
+## Recommended Fix
+
+Given the user's preference to keep using XGO directly, **Option 1** is the minimal fix:
+
 ```yaml
-- name: Build macOS libraries
-  run: |
-    CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 \
-      go build -buildmode=c-shared -ldflags="-w" \
-      -o build/server-darwin-amd64.dylib ./cmd
+xgo_version: v0.24.0  # or v0.23.0 - last version before OSXCross 12.3
 ```
 
-This produces proper `.dylib` shared libraries.
+This restores the working behavior from v2.1.0 with a one-line change.
+
+## Alternative: Update to Latest XGO
+If XGO has fixed the issue in newer versions, we could:
+1. Check latest XGO releases
+2. Test with latest version
+3. Report issue to XGO maintainers if still broken
 
 ## Conclusion
 
-XGO **does** generate darwin binaries, but:
-1. They have the wrong file extension (missing `.dylib`)
-2. They are the wrong file type (ar archives instead of dylibs)
-3. The `-buildmode c-shared` flag isn't being respected
-
-The proper fix is to use a native macOS runner for darwin builds, which has already been implemented in the current PR.
+The OSXCross 12.3 update in XGO broke darwin c-shared builds. The simplest fix is pinning `xgo_version` to the last working version (v0.24.0 or earlier from before September 2025).
