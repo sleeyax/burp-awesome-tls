@@ -5,4 +5,4 @@
 *.so
 *.dll
 *.dylib
-.DS_Store
+.DS_Storesrc-go/server/build/
