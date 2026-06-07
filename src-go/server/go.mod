@@ -6,7 +6,7 @@ toolchain go1.26.3
 
 require (
 	github.com/bogdanfinn/fhttp v0.6.8
-	github.com/bogdanfinn/tls-client v1.14.0
+	github.com/bogdanfinn/tls-client v1.15.0
 	github.com/bogdanfinn/utls v1.7.7-barnius
 )
 
