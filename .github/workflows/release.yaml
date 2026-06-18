@@ -11,7 +11,7 @@ jobs:
     name: Build and release binaries
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Execute CGO builds using XGO
         uses: crazy-max/ghaction-xgo@v4
         # docs: https://github.com/marketplace/actions/golang-cgo-cross-compiler#inputs
