@@ -12,6 +12,8 @@ github.com/bogdanfinn/tls-client v1.14.0 h1:vyk7Cn4BIvLAGVuMfb0tP22OqogfO1lYamqu
 github.com/bogdanfinn/tls-client v1.14.0/go.mod h1:LsU6mXVn8MOFDwTkyRfI7V1BZM1p0wf2ZfZsICW/1fM=
 github.com/bogdanfinn/tls-client v1.15.0 h1:A+J8ZIggYbIg/6Cnzz4tX3aY0Hyt9k2lhO9qVnImDxQ=
 github.com/bogdanfinn/tls-client v1.15.0/go.mod h1:LsU6mXVn8MOFDwTkyRfI7V1BZM1p0wf2ZfZsICW/1fM=
+github.com/bogdanfinn/tls-client v1.15.1 h1:KiFAlED55DJ8Fcocn+/1nX6PrDFcttIHAf/GDkV6KN8=
+github.com/bogdanfinn/tls-client v1.15.1/go.mod h1:LsU6mXVn8MOFDwTkyRfI7V1BZM1p0wf2ZfZsICW/1fM=
 github.com/bogdanfinn/utls v1.7.7-barnius h1:OuJ497cc7F3yKNVHRsYPQdGggmk5x6+V5ZlrCR7fOLU=
 github.com/bogdanfinn/utls v1.7.7-barnius/go.mod h1:aAK1VZQlpKZClF1WEQeq6kyclbkPq4hz6xTbB5xSlmg=
 github.com/bogdanfinn/websocket v1.5.5-barnius h1:bY+qnxpai1qe7Jmjx+Sds/cmOSpuuLoR8x61rWltjOI=
