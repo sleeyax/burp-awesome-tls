@@ -2,7 +2,7 @@ module server
 
 go 1.24.1
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 require (
 	github.com/bogdanfinn/fhttp v0.6.9
