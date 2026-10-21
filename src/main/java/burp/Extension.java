@@ -73,7 +73,7 @@ public class Extension implements BurpExtension {
             }
 
             var transportConfig = settings.toTransportConfig();
-            transportConfig.Host = requestURL.getHost();
+            transportConfig.Host = requestURL.getPort() == -1 ? requestURL.getHost() : requestURL.getHost() + ":" + requestURL.getPort();
             transportConfig.Scheme = requestURL.getProtocol();
             transportConfig.HeaderOrder = headerOrder;
 
