@@ -1,0 +1,12 @@
+{
+  "Host": "example.com:8443",
+  "Scheme": "https",
+  "InterceptProxyAddr": "127.0.0.1:8886",
+  "BurpAddr": "127.0.0.1:8080",
+  "Fingerprint": "chrome_133",
+  "HexClientHello": "1603",
+  "UseInterceptedFingerprint": true,
+  "HttpTimeout": 30,
+  "HeaderOrder": ["Host", "User-Agent"],
+  "ExternalProxyUrl": "http://user:pass@proxy:3128"
+}
