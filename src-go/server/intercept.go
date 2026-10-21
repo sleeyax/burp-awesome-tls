@@ -149,7 +149,7 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 		}
 
 		buf := make([]byte, 1)
-		if _, err = inReader.Read(buf); err != nil {
+		if _, err = io.ReadFull(inReader, buf); err != nil {
 			s.writeError(err)
 			return
 		}
@@ -163,7 +163,7 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		// read tls version
 		buf = make([]byte, 2)
-		if _, err = inReader.Read(buf); err != nil {
+		if _, err = io.ReadFull(inReader, buf); err != nil {
 			s.writeError(err)
 			return
 		}
@@ -172,7 +172,7 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		// read client hello length
 		buf = make([]byte, 2)
-		if _, err = inReader.Read(buf); err != nil {
+		if _, err = io.ReadFull(inReader, buf); err != nil {
 			s.writeError(err)
 			return
 		}
@@ -182,7 +182,7 @@ func (s *interceptProxy) readClientHello(inReader io.Reader) {
 
 		// read remaining client hello by length
 		buf = make([]byte, length)
-		if _, err = inReader.Read(buf); err != nil {
+		if _, err = io.ReadFull(inReader, buf); err != nil {
 			s.writeError(err)
 			return
 		}
