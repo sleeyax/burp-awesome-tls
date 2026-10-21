@@ -72,12 +72,7 @@ public class Extension implements BurpExtension {
                 headerOrder[i] = request.headers().get(i).name();
             }
 
-            var transportConfig = settings.toTransportConfig();
-            transportConfig.Host = requestURL.getPort() == -1 ? requestURL.getHost() : requestURL.getHost() + ":" + requestURL.getPort();
-            transportConfig.Scheme = requestURL.getProtocol();
-            transportConfig.HeaderOrder = headerOrder;
-
-            var goConfigJSON = gson.toJson(transportConfig);
+            var goConfigJSON = gson.toJson(buildTransportConfig(settings, requestURL, headerOrder));
             var url = new URI("https://" + settings.getSpoofProxyAddress()).toURL();
             var httpService = HttpService.httpService(url.getHost(), url.getPort(), Objects.equals(url.getProtocol(), "https"));
             var nextRequest = request.withService(httpService).withAddedHeader(HEADER_KEY, goConfigJSON);
@@ -87,5 +82,13 @@ public class Extension implements BurpExtension {
             api.logging().logToError("Http request error: " + e);
             return null;
         }
+    }
+
+    static TransportConfig buildTransportConfig(Settings settings, URL requestURL, String[] headerOrder) {
+        var transportConfig = settings.toTransportConfig();
+        transportConfig.Host = requestURL.getPort() == -1 ? requestURL.getHost() : requestURL.getHost() + ":" + requestURL.getPort();
+        transportConfig.Scheme = requestURL.getProtocol();
+        transportConfig.HeaderOrder = headerOrder;
+        return transportConfig;
     }
 }

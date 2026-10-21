@@ -9,6 +9,16 @@ dependencies {
     implementation 'net.java.dev.jna:jna:5.19.1'
     implementation 'com.google.code.gson:gson:2.14.0'
     implementation 'com.intellij:forms_rt:7.0.3'
+
+    testImplementation "net.portswigger.burp.extensions:montoya-api:2026.7"
+    testImplementation platform('org.junit:junit-bom:6.1.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.24.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.register('buildJar', Jar) {
