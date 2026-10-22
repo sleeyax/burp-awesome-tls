@@ -15,7 +15,14 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.27'
+          go-version-file: src-go/server/go.mod
+          cache-dependency-path: src-go/server/go.sum
+      - name: Vet Go code
+        working-directory: ./src-go/server
+        run: go vet ./...
+      - name: Test Go code
+        working-directory: ./src-go/server
+        run: go test -race ./...
       - name: Build Go library
         working-directory: ./src-go/server
         run: |
@@ -27,6 +34,10 @@ jobs:
           distribution: 'adopt'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
+      - name: Test Java code
+        run: ./gradlew test
+      - name: Test native library
+        run: ./gradlew nativeTest
       - name: Build with Gradle
         run: ./gradlew buildJar
       - name: List binaries

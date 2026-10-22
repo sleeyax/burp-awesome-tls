@@ -8,7 +8,7 @@ on:
       - 'v*'
 jobs:
   build:
-    name: Build and release binaries
+    name: Build binaries
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -37,10 +37,67 @@ jobs:
       - name: Build cross-platform jar files
         shell: sh
         run: ./build.sh
+      - name: Store jar files
+        uses: actions/upload-artifact@v7
+        with:
+          name: jars
+          path: ./build/libs/*.jar
+          if-no-files-found: error
+
+  smoke-test:
+    name: Smoke test ${{ matrix.jar }}
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      # The 32-bit and linux/arm builds have no hosted runner to load them on.
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            jar: linux-amd64
+          - runner: ubuntu-24.04-arm
+            jar: linux-arm64
+          - runner: windows-latest
+            jar: windows-amd64
+          - runner: macos-latest
+            jar: macos-arm64
+          - runner: macos-15-intel
+            jar: macos-amd64
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download jar files
+        uses: actions/download-artifact@v8
+        with:
+          name: jars
+          path: jars
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+      - name: Test platform jar
+        shell: bash
+        run: ./gradlew nativeTest -PextensionJar=jars/Burp-Awesome-TLS-${{ matrix.jar }}.jar
+      - name: Test fat jar
+        shell: bash
+        run: ./gradlew nativeTest --rerun -PextensionJar=jars/Burp-Awesome-TLS-fat.jar
+
+  release:
+    name: Release binaries
+    needs: smoke-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download jar files
+        uses: actions/download-artifact@v8
+        with:
+          name: jars
+          path: jars
       - name: Upload binaries
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "./build/libs/*.jar"
+          file: "./jars/*.jar"
           tags: true

@@ -37,6 +37,34 @@ func StartServer(addr string) error {
 		return fmt.Errorf("NewCertificateAuthority, err: %w", err)
 	}
 
+	s.Addr = addr
+	s.Handler = newHandler()
+	s.TLSConfig = &utls.Config{
+		Certificates: []utls.Certificate{
+			{
+				Certificate: [][]byte{ca.Raw},
+				PrivateKey:  private,
+				Leaf:        ca,
+			},
+		},
+		NextProtos: []string{"http/1.1"},
+	}
+
+	listener, err := net.Listen("tcp", s.Addr)
+	if err != nil {
+		return fmt.Errorf("listen, err: %w", err)
+	}
+
+	tlsListener := utls.NewListener(listener, s.TLSConfig)
+
+	if err := s.Serve(tlsListener); err != nil {
+		return fmt.Errorf("serve, err: %w", err)
+	}
+
+	return nil
+}
+
+func newHandler() fhttp.Handler {
 	m := fhttp.NewServeMux()
 	m.HandleFunc("/", func(w fhttp.ResponseWriter, req *fhttp.Request) {
 		configHeader := req.Header.Get(ConfigurationHeaderKey)
@@ -112,32 +140,7 @@ func StartServer(addr string) error {
 		w.WriteHeader(res.StatusCode)
 		w.Write(body)
 	})
-
-	s.Addr = addr
-	s.Handler = m
-	s.TLSConfig = &utls.Config{
-		Certificates: []utls.Certificate{
-			{
-				Certificate: [][]byte{ca.Raw},
-				PrivateKey:  private,
-				Leaf:        ca,
-			},
-		},
-		NextProtos: []string{"http/1.1"},
-	}
-
-	listener, err := net.Listen("tcp", s.Addr)
-	if err != nil {
-		return fmt.Errorf("listen, err: %w", err)
-	}
-
-	tlsListener := utls.NewListener(listener, s.TLSConfig)
-
-	if err := s.Serve(tlsListener); err != nil {
-		return fmt.Errorf("serve, err: %w", err)
-	}
-
-	return nil
+	return m
 }
 
 func StartProxy(interceptAddr, burpAddr string) (err error) {

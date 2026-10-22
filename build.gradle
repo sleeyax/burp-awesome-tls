@@ -9,6 +9,36 @@ dependencies {
     implementation 'net.java.dev.jna:jna:5.19.1'
     implementation 'com.google.code.gson:gson:2.14.0'
     implementation 'com.intellij:forms_rt:7.0.3'
+
+    testImplementation "net.portswigger.burp.extensions:montoya-api:2026.7"
+    testImplementation platform('org.junit:junit-bom:6.1.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.24.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform {
+        excludeTags 'native'
+    }
+}
+
+// Loads the Go server library through JNA, from src/main/resources or, with -PextensionJar=<path>, from a built jar.
+tasks.register('nativeTest', Test) {
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = project.hasProperty('extensionJar')
+            ? files(project.property('extensionJar')) + sourceSets.test.output + configurations.testRuntimeClasspath
+            : sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'native'
+    }
+
+    // The server writes its CA to the user config directory, which the Go runtime resolves from these variables.
+    def configHome = layout.buildDirectory.dir('native-test-home').get().asFile
+    environment 'XDG_CONFIG_HOME', configHome
+    environment 'HOME', configHome
+    environment 'AppData', configHome
 }
 
 tasks.register('buildJar', Jar) {
