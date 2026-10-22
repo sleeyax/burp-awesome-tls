@@ -75,6 +75,10 @@ func spoof(t *testing.T, spoofURL string, r spoofRequest) (*http.Response, strin
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Fail here rather than letting the caller wait on a target the request never reached.
+	if strings.HasPrefix(string(body), "Awesome TLS error") {
+		t.Fatalf("spoof server failed with status %d: %s", res.StatusCode, body)
+	}
 	return res, string(body)
 }
 
