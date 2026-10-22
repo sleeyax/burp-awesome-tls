@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
       - name: Build cross-platform jar files
