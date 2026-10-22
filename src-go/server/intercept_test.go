@@ -15,6 +15,22 @@ import (
 type fakeBurp struct {
 	mu       sync.Mutex
 	received bytes.Buffer
+	conns    []net.Conn
+}
+
+func (b *fakeBurp) track(conn net.Conn) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.conns = append(b.conns, conn)
+}
+
+// closeConns ends the proxy's tunnels, which otherwise stay open waiting for Burp to hang up.
+func (b *fakeBurp) closeConns() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	for _, conn := range b.conns {
+		conn.Close()
+	}
 }
 
 func (b *fakeBurp) Write(p []byte) (int, error) {
@@ -36,15 +52,19 @@ func newTestInterceptProxy(t *testing.T) (*interceptProxy, *fakeBurp) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { l.Close() })
-
 	burp := &fakeBurp{}
+	t.Cleanup(func() {
+		l.Close()
+		burp.closeConns()
+	})
+
 	go func() {
 		for {
 			conn, err := l.Accept()
 			if err != nil {
 				return
 			}
+			burp.track(conn)
 			go func() {
 				defer conn.Close()
 				io.Copy(burp, conn)
