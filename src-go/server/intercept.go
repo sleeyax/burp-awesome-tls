@@ -205,7 +205,7 @@ func (s *interceptProxy) readAll(reader io.Reader) {
 }
 
 func (s *interceptProxy) writeError(err error) {
-	if errors.Is(err, io.EOF) {
+	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 		return
 	}
 

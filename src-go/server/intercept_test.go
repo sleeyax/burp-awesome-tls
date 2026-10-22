@@ -1,42 +1,65 @@
 package server
 
 import (
+	"bytes"
 	"encoding/hex"
 	"io"
 	"net"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 )
 
-func newTestInterceptProxy(t *testing.T) *interceptProxy {
+// fakeBurp stands in for Burp's proxy listener and records everything sent to it.
+type fakeBurp struct {
+	mu       sync.Mutex
+	received bytes.Buffer
+}
+
+func (b *fakeBurp) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.received.Write(p)
+}
+
+func (b *fakeBurp) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.received.String()
+}
+
+func newTestInterceptProxy(t *testing.T) (*interceptProxy, *fakeBurp) {
 	t.Helper()
 
-	burp, err := net.Listen("tcp", "127.0.0.1:0")
+	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { burp.Close() })
+	t.Cleanup(func() { l.Close() })
+
+	burp := &fakeBurp{}
 	go func() {
 		for {
-			conn, err := burp.Accept()
+			conn, err := l.Accept()
 			if err != nil {
 				return
 			}
 			go func() {
 				defer conn.Close()
-				io.Copy(io.Discard, conn)
+				io.Copy(burp, conn)
 			}()
 		}
 	}()
 
-	p, err := newInterceptProxy("127.0.0.1:0", burp.Addr().String())
+	p, err := newInterceptProxy("127.0.0.1:0", l.Addr().String())
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { p.Stop() })
 	go p.Start()
 
-	return p
+	return p, burp
 }
 
 func waitForFingerprint(t *testing.T, p *interceptProxy, want string) {
@@ -55,7 +78,7 @@ func waitForFingerprint(t *testing.T, p *interceptProxy, want string) {
 
 func TestInterceptProxyCapturesClientHello(t *testing.T) {
 	hello := readClientHelloFixture(t, "chromium_154")
-	p := newTestInterceptProxy(t)
+	p, _ := newTestInterceptProxy(t)
 
 	conn, err := net.Dial("tcp", p.listener.Addr().String())
 	if err != nil {
@@ -75,7 +98,7 @@ func TestInterceptProxyCapturesClientHello(t *testing.T) {
 
 func TestInterceptProxyCapturesFragmentedClientHello(t *testing.T) {
 	hello := readClientHelloFixture(t, "firefox_158")
-	p := newTestInterceptProxy(t)
+	p, _ := newTestInterceptProxy(t)
 
 	conn, err := net.Dial("tcp", p.listener.Addr().String())
 	if err != nil {
@@ -94,7 +117,7 @@ func TestInterceptProxyCapturesFragmentedClientHello(t *testing.T) {
 }
 
 func TestInterceptProxyStop(t *testing.T) {
-	p := newTestInterceptProxy(t)
+	p, _ := newTestInterceptProxy(t)
 	addr := p.listener.Addr().String()
 
 	if err := p.Stop(); err != nil {
@@ -104,5 +127,24 @@ func TestInterceptProxyStop(t *testing.T) {
 	if conn, err := net.DialTimeout("tcp", addr, time.Second); err == nil {
 		conn.Close()
 		t.Error("intercept proxy still accepts connections after Stop")
+	}
+}
+
+func TestInterceptProxyIgnoresTruncatedClientHello(t *testing.T) {
+	hello := readClientHelloFixture(t, "chromium_154")
+	p, burp := newTestInterceptProxy(t)
+
+	conn, err := net.Dial("tcp", p.listener.Addr().String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Write(hello[:100]); err != nil {
+		t.Fatal(err)
+	}
+	conn.Close()
+
+	time.Sleep(500 * time.Millisecond)
+	if strings.Contains(burp.String(), "awesome-tls-error") {
+		t.Error("client disconnecting mid-ClientHello was reported to Burp as an error")
 	}
 }
