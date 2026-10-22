@@ -30,7 +30,7 @@ var currentSerialNumber = time.Now().Unix()
 func getAbsoluteFilePath(file string) string {
 	if userConfigDir, err := os.UserConfigDir(); err == nil {
 		configDir := path.Join(userConfigDir, "burp-awesome-tls")
-		_ = os.Mkdir(configDir, 0o700)
+		_ = os.MkdirAll(configDir, 0o700)
 		return path.Join(configDir, file)
 	}
 

@@ -39,7 +39,6 @@ tasks.register('nativeTest', Test) {
     environment 'XDG_CONFIG_HOME', configHome
     environment 'HOME', configHome
     environment 'AppData', configHome
-    doFirst { configHome.mkdirs() }
 }
 
 tasks.register('buildJar', Jar) {

@@ -9,19 +9,16 @@ import (
 	"testing"
 )
 
-// useTempConfigDir points os.UserConfigDir at a temporary directory on every platform and returns where the CA files will be written.
+// useTempConfigDir points os.UserConfigDir at a not yet existing temporary directory on every platform and returns where the CA files will be written.
 func useTempConfigDir(t *testing.T) string {
 	t.Helper()
-	dir := t.TempDir()
+	dir := filepath.Join(t.TempDir(), "home")
 	t.Setenv("XDG_CONFIG_HOME", dir)
 	t.Setenv("HOME", dir)
 	t.Setenv("AppData", dir)
 
 	configDir, err := os.UserConfigDir()
 	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(configDir, 0o700); err != nil {
 		t.Fatal(err)
 	}
 	return filepath.Join(configDir, "burp-awesome-tls")
