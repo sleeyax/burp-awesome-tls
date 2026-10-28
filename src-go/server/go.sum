@@ -1,5 +1,7 @@
 github.com/andybalholm/brotli v1.2.0 h1:ukwgCxwYrmACq68yiUqwIWnGY0cTPox/M94sVwToPjQ=
 github.com/andybalholm/brotli v1.2.0/go.mod h1:rzTDkvFWvIrjDXZHkuS16NPggd91W3kUSvPlQ1pLaKY=
+github.com/andybalholm/brotli v1.2.7 h1:UgafRPGMam5ySHfRkhthMqOFA6IFoeF3D7mWIDLjG5A=
+github.com/andybalholm/brotli v1.2.7/go.mod h1:rzTDkvFWvIrjDXZHkuS16NPggd91W3kUSvPlQ1pLaKY=
 github.com/bdandy/go-errors v1.2.2 h1:WdFv/oukjTJCLa79UfkGmwX7ZxONAihKu4V0mLIs11Q=
 github.com/bdandy/go-errors v1.2.2/go.mod h1:NkYHl4Fey9oRRdbB1CoC6e84tuqQHiqrOcZpqFEkBxM=
 github.com/bdandy/go-socks4 v1.2.3 h1:Q6Y2heY1GRjCtHbmlKfnwrKVU/k81LS8mRGLRlmDlic=
@@ -10,12 +12,16 @@ github.com/bogdanfinn/fhttp v0.6.9 h1:F9MsWR1K6JMRlXN4Q/MfjYmptr29nCdycQo+OPBG5U
 github.com/bogdanfinn/fhttp v0.6.9/go.mod h1:7phoj3f/q54WuiTnCTlAhEoaVcdlruKkSzCSD47LzHk=
 github.com/bogdanfinn/fhttp v0.7.1 h1:Vrw5Fo3sbEPD4s2kds7/vuM74i9JXxeK8E3GczofwOw=
 github.com/bogdanfinn/fhttp v0.7.1/go.mod h1:Pco5Ml+HnzrBRAu+6BORirlCAF9JqKmAvC0vI3JSjss=
+github.com/bogdanfinn/fhttp v0.7.3 h1:DLiZfU9dKD+JCFDUZk8XUgbwm32DuvPLp9x2mucNPv0=
+github.com/bogdanfinn/fhttp v0.7.3/go.mod h1:Pco5Ml+HnzrBRAu+6BORirlCAF9JqKmAvC0vI3JSjss=
 github.com/bogdanfinn/quic-go-utls v1.0.9-utls h1:tV6eDEiRbRCcepALSzxR94JUVD3N3ACIiRLgyc2Ep8s=
 github.com/bogdanfinn/quic-go-utls v1.0.9-utls/go.mod h1:aHph9B9H9yPOt5xnhWKSOum27DJAqpiHzwX+gjvaXcg=
 github.com/bogdanfinn/quic-go-utls v1.0.10-utls h1:oZN+J3OKMmWaVbI/sx4ULvHiAXbWJKVcvEFW4fkybMU=
 github.com/bogdanfinn/quic-go-utls v1.0.10-utls/go.mod h1:bBLJ2Vy68Q7y6VfbG9czd825rTcQua7n+y12RM9Q588=
 github.com/bogdanfinn/quic-go-utls v1.0.12-utls h1:uuWyRGD1jZQl2IAL9rTDVA5V0Mm8VlIoBPhTu6IaynU=
 github.com/bogdanfinn/quic-go-utls v1.0.12-utls/go.mod h1:Uq7Hfq7wNs7N8JirJMLy7hRyAE0tcrvcWoITfDpjrMw=
+github.com/bogdanfinn/quic-go-utls v1.0.13-utls h1:csafI+9mkfwRqwM8dXdcmC6mgwxTAj+d+PhcqLHnUWg=
+github.com/bogdanfinn/quic-go-utls v1.0.13-utls/go.mod h1:w92OqFJYP900bLkAjvnnvV4M43XikIvhvsY39AxXQfM=
 github.com/bogdanfinn/tls-client v1.14.0 h1:vyk7Cn4BIvLAGVuMfb0tP22OqogfO1lYamquQNEZU1A=
 github.com/bogdanfinn/tls-client v1.14.0/go.mod h1:LsU6mXVn8MOFDwTkyRfI7V1BZM1p0wf2ZfZsICW/1fM=
 github.com/bogdanfinn/tls-client v1.15.0 h1:A+J8ZIggYbIg/6Cnzz4tX3aY0Hyt9k2lhO9qVnImDxQ=
@@ -26,6 +32,8 @@ github.com/bogdanfinn/tls-client v1.16.0 h1:km3YLI6CMRLZnfrC+hGStePPryIicd3hoxFQ
 github.com/bogdanfinn/tls-client v1.16.0/go.mod h1:TxbiXlpZhNN5xmxzsr3KhNAeqoEEPJafwgBbyp26Phc=
 github.com/bogdanfinn/tls-client v1.17.1 h1:X03STW0lc/Fnt9ihcbrJqoDmM3JBGY9JBTtmchNc7tc=
 github.com/bogdanfinn/tls-client v1.17.1/go.mod h1:7eNNENu11RkFyC4QN+voIAbZIdGazRI8lqCA7gW3+0Y=
+github.com/bogdanfinn/tls-client v1.18.0 h1:CNh+8Mq0lU+iAxn3TkxhHQrucIOpPacAl7cio8HVo1c=
+github.com/bogdanfinn/tls-client v1.18.0/go.mod h1:T7hIrZnYRex0YFc/CWkEvxRV28RXUQlROb2b5FgM4BU=
 github.com/bogdanfinn/utls v1.7.7-barnius h1:OuJ497cc7F3yKNVHRsYPQdGggmk5x6+V5ZlrCR7fOLU=
 github.com/bogdanfinn/utls v1.7.7-barnius/go.mod h1:aAK1VZQlpKZClF1WEQeq6kyclbkPq4hz6xTbB5xSlmg=
 github.com/bogdanfinn/utls v1.7.8-barnius h1:wRT83mP4hmuMM1/lIpLKKhzaEuyEKjux7VSj7XHFXdg=
@@ -38,6 +46,8 @@ github.com/bogdanfinn/websocket v1.5.6-barnius h1:QpdWVEZ9rKtcT7C2pU19uE2KQw2Xev
 github.com/bogdanfinn/websocket v1.5.6-barnius/go.mod h1:41/rXLDWpqJ5A4gOKSY/z4NLbW/hHZHneRcYM0kbpxA=
 github.com/bogdanfinn/websocket v1.5.8-barnius h1:0iEeiWHpPZ3ObhIvrzZb6heBFAY3STLZuZmcDiwRZ98=
 github.com/bogdanfinn/websocket v1.5.8-barnius/go.mod h1:NeZ76jYsBuK7tgJkcuSl+lXn0RRjM2f3XYT4Wa09UcQ=
+github.com/bogdanfinn/websocket v1.5.9-barnius h1:KY6PMx2I3WspLKJ++wPF5TNhd/fxqu5IpYU+lfH5DbM=
+github.com/bogdanfinn/websocket v1.5.9-barnius/go.mod h1:Ay6DcmnKVlpGsLhBucpap77R2e30O//zw7ggH4HIn0o=
 github.com/cloudflare/circl v1.6.2 h1:hL7VBpHHKzrV5WTfHCaBsgx/HGbBYlgrwvNXEVDYYsQ=
 github.com/cloudflare/circl v1.6.2/go.mod h1:2eXP6Qfat4O/Yhh8BznvKnJ+uzEoTQ6jVKJRn81BiS4=
 github.com/cloudflare/circl v1.6.3 h1:9GPOhQGF9MCYUeXyMYlqTR6a5gTrgR/fBLXvUgtVcg8=
